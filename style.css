@@ -607,6 +607,23 @@ footer {
     margin-top: 16px;
 }
 
+.footer-credit {
+    margin-top: 6px;
+    color: var(--text-secondary);
+}
+
+.footer-credit a {
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s ease;
+}
+
+.footer-credit a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
 /* Mobile & Tablet Adjustments */
 @media (max-width: 968px) {
     .canvas-container {
