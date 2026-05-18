@@ -2,6 +2,10 @@
 
 A fast, interactive 3D Rubik's Cube solver. It combines **Rust & WebAssembly** for high-performance solving (Kociemba's two-phase algorithm) and **Three.js & GSAP** for smooth 3D animations and rendering.
 
+**⚡ Live Demo: [https://dmachard.github.io/cube-solver-wasm/](https://dmachard.github.io/cube-solver-wasm/)**
+
+![Overview](img/overview.png)
+
 > This project is a vibe coding project with Antigravity editor.
 
 ---
