@@ -607,6 +607,11 @@ footer {
     margin-top: 16px;
 }
 
+.app-version {
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
 .footer-credit {
     margin-top: 6px;
     color: var(--text-secondary);

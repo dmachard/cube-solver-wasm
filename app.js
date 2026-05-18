@@ -1,5 +1,5 @@
 // 1. Import standard compiled WebAssembly JS bindings from wasm-pack
-import init, { solve } from './pkg/cube_solver_wasm.js';
+import init, { solve, version } from './pkg/cube_solver_wasm.js';
 
 // 2. Import our clean modular specialized scripts
 import { state } from './js/constants.js';
@@ -25,6 +25,12 @@ async function startApplication() {
         // 2. Load the WebAssembly binary locally into the browser linear memory
         await init();
         wasmModule = true; // Set loaded flag
+
+        // Populate application version dynamically from WASM
+        const versionEl = document.querySelector(".app-version");
+        if (versionEl) {
+            versionEl.textContent = `v${version()}`;
+        }
 
         // Update the validation message once Rust engine is online
         const msgEl = document.getElementById("validation-message");

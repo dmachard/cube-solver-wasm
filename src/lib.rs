@@ -38,3 +38,9 @@ pub fn solve(cube_string: &str) -> String {
         None => "No solution found.".to_string(),
     }
 }
+
+/// Expose the package version defined in Cargo.toml at compile time
+#[wasm_bindgen]
+pub fn version() -> String {
+    env!("CARGO_PKG_VERSION").to_string()
+}
