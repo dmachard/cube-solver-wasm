@@ -1,0 +1,595 @@
+/* ==========================================================================
+   1. Theme Variables & Base Setup (Minimalist SaaS / Designer Theme)
+   ========================================================================== */
+:root {
+    --bg-base: #f8fafc;
+    /* Clean light slate background */
+    --bg-surface: #ffffff;
+    /* Pure white card panels */
+    --border-standard: #e2e8f0;
+    /* Very thin, elegant slate borders */
+    --border-focus: #94a3b8;
+    /* Slate for active outlines */
+
+    --text-primary: #0f172a;
+    /* Deep slate for highly readable text */
+    --text-secondary: #475569;
+    /* Medium slate for labels and descriptions */
+    --text-muted: #94a3b8;
+    /* Light slate for helpers and instructions */
+
+    --accent: #0f172a;
+    /* Clean, minimalist black/dark slate accent */
+    --accent-hover: #1e293b;
+    --accent-light: #f1f5f9;
+
+    --error: #ef4444;
+    --error-bg: #fef2f2;
+    --success: #10b981;
+    --success-bg: #ecfdf5;
+    --warning: #f59e0b;
+    --warning-bg: #fffbeb;
+
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* ==========================================================================
+   2. Main Layout Structure (Responsive)
+   ========================================================================== */
+.app-container {
+    width: 100%;
+    max-width: 1100px;
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+header {
+    text-align: left;
+    /* Aligned left like modern apps */
+    border-bottom: 1px solid var(--border-standard);
+    padding-bottom: 24px;
+}
+
+.logo {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 700px;
+    line-height: 1.5;
+}
+
+/* Responsive Grid for Dual Panels */
+.workspace {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: 32px;
+    align-items: stretch;
+    /* Automatically forces both panels to have equal height */
+}
+
+@media (max-width: 968px) {
+    .workspace {
+        grid-template-columns: 1fr;
+        /* Stack vertically on tablets and mobile */
+    }
+
+    .panel {
+        height: auto !important;
+        /* Allow panels to adapt to content size on mobile */
+    }
+
+    .app-container {
+        padding: 30px 15px;
+    }
+}
+
+/* ==========================================================================
+   3. Panel & Cards Design
+   ========================================================================== */
+.panel {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-standard);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 10px 20px -5px rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    min-width: 0;
+    /* Prevents grid/flex items from expanding past their columns */
+    height: 820px;
+    /* Highly generous locked height to prevent any possible cutoff and guarantee symmetry */
+}
+
+/* Explicit class for the 3D visualizer to lock its dimensions */
+.visualizer-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.panel-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.panel-desc {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   4. Left Panel: 2D Editor & Palette
+   ========================================================================== */
+.palette-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.palette-container label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+}
+
+.palette {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.color-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    border: 1px solid var(--border-standard);
+    cursor: pointer;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.color-btn.active {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+}
+
+/* 2D Cross Net Container */
+.net-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 0;
+    overflow-x: auto;
+}
+
+.cube-net {
+    display: grid;
+    grid-template-columns: repeat(4, 90px);
+    grid-template-rows: repeat(3, 90px);
+    gap: 8px;
+    width: max-content;
+}
+
+/* Position 6 faces on cross grid */
+.face-u {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.face-l {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.face-f {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.face-r {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+.face-b {
+    grid-column: 4;
+    grid-row: 2;
+}
+
+.face-d {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+.face {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 2px;
+    background: #f1f5f9;
+    /* Soft background border for the cubies */
+    border: 1px solid var(--border-standard);
+    border-radius: 6px;
+    padding: 4px;
+    width: 90px;
+    height: 90px;
+}
+
+/* Individual facelet buttons */
+.facelet {
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: transform 0.1s ease, filter 0.15s ease;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.facelet:hover {
+    transform: scale(1.05);
+    filter: brightness(0.95);
+}
+
+.facelet.center-lock {
+    cursor: not-allowed !important;
+    transform: none !important;
+    filter: none !important;
+}
+
+/* Clear, flat high-contrast Rubik's colors */
+.c-u {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+.c-l {
+    background-color: #f97316 !important;
+}
+
+.c-f {
+    background-color: #10b981 !important;
+}
+
+.c-r {
+    background-color: #ef4444 !important;
+}
+
+.c-b {
+    background-color: #2563eb !important;
+}
+
+.c-d {
+    background-color: #ffea00 !important;
+}
+
+/* Editor Secondary Actions */
+.editor-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-secondary {
+    flex: 1;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-standard);
+    color: var(--text-primary);
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-secondary:hover {
+    background: var(--accent-light);
+    border-color: var(--border-focus);
+}
+
+/* Validation status alert boxes (flat style) */
+.validation-box {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid transparent;
+}
+
+.validation-box.warning {
+    background: var(--warning-bg);
+    border-color: rgba(245, 158, 11, 0.15);
+    color: #b45309;
+}
+
+.validation-box.error {
+    background: var(--error-bg);
+    border-color: rgba(239, 68, 68, 0.15);
+    color: #b91c1c;
+}
+
+.validation-box.success {
+    background: var(--success-bg);
+    border-color: rgba(16, 185, 129, 0.15);
+    color: #047857;
+}
+
+/* Clean, Minimalist Slate Primary Action Button */
+.btn-primary {
+    position: relative;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--accent-hover);
+}
+
+.btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Loader spinner inside button */
+.loader {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ==========================================================================
+   5. Right Panel: 3D Canvas
+   ========================================================================== */
+.canvas-container {
+    width: 100%;
+    flex: 1 1 auto;
+    /* Grow and shrink dynamically inside the visualizer panel */
+    min-height: 200px;
+    border-radius: 12px;
+    background: #0f172a;
+    /* Clean slate-900 background for 3D model contrast */
+    border: 1px solid var(--border-standard);
+    overflow: hidden;
+    position: relative;
+    cursor: grab;
+}
+
+.canvas-container:active {
+    cursor: grabbing;
+}
+
+.canvas-instructions {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    pointer-events: none;
+}
+
+.canvas-instructions span {
+    font-size: 0.7rem;
+    color: #64748b;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 3px 6px;
+    border-radius: 4px;
+}
+
+@media (max-width: 480px) {
+    .visualizer-panel {
+        height: 520px;
+        /* Keep visualizer card compact on small devices */
+    }
+}
+
+/* ==========================================================================
+   6. Premium Horizontal Stepped Timeline
+   ========================================================================== */
+.player-panel {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: auto;
+    /* Push to the very bottom of the card */
+    padding-top: 16px;
+    animation: fadeIn 0.4s ease forwards;
+}
+
+/* Horizontally scrollable timeline card */
+.timeline-container {
+    width: 100%;
+    background: transparent;
+    /* Seamless blend */
+    border: none;
+    /* Removed inner rectangle border outline! */
+    padding: 12px 0;
+    overflow-x: auto;
+    position: relative;
+}
+
+/* Custom Scrollbar for horizontal timeline */
+.timeline-container::-webkit-scrollbar {
+    height: 6px;
+}
+
+.timeline-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.timeline-container::-webkit-scrollbar-thumb {
+    background: var(--border-standard);
+    border-radius: 3px;
+}
+
+.timeline-container::-webkit-scrollbar-thumb:hover {
+    background: var(--border-focus);
+}
+
+.moves-timeline {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    width: max-content;
+    padding: 6px 16px; /* Generous 16px padding on left/right to prevent any active halo shadow cutoff! */
+    position: relative;
+}
+
+/* Horizontal connecting track line behind the step circles */
+.moves-timeline::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 35px; /* Aligns perfectly with the center of the first circle (16px padding + 19px half-width) */
+    right: 35px; /* Aligns perfectly with the center of the last circle (16px padding + 19px half-width) */
+    height: 3px;
+    background: var(--border-standard);
+    transform: translateY(-50%);
+    z-index: 1;
+    border-radius: 1.5px;
+    transition: background 0.3s ease;
+}
+
+.step-node {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--bg-surface);
+    border: 2px solid var(--border-standard);
+    color: var(--text-secondary);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 2;
+    user-select: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.step-node:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.12);
+}
+
+/* Completed Steps: Glowing border and background */
+.step-node.completed {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-light);
+}
+
+/* Active Step: Vibrant premium circular badge with custom accent ring */
+.step-node.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    box-shadow: 0 0 0 4px var(--accent-light), 0 4px 12px rgba(99, 102, 241, 0.25);
+    transform: scale(1.15) translateY(-1px);
+}
+
+
+/* ==========================================================================
+   7. Footer & Animations
+   ========================================================================== */
+footer {
+    text-align: left;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-standard);
+    padding-top: 20px;
+    margin-top: 16px;
+}
+
+/* Mobile & Tablet Adjustments */
+@media (max-width: 968px) {
+    .canvas-container {
+        height: 380px;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

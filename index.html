@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Rubik's Cube Solver</title>
+
+    <!-- 1. Premium Typography from Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;800&display=swap"
+        rel="stylesheet">
+
+    <!-- 2. Modern Glassmorphism Styling -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Radial background glows for futuristic vibes -->
+    <div class="background-glow"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header>
+            <h1>3D Rubik's Cube Solver</h1>
+            <p class="subtitle">Solve your physical Rubik's cube step by step.</p>
+        </header>
+
+        <!-- Main Workspace (Responsive Dual-Panel Grid) -->
+        <main class="workspace">
+
+            <!-- LEFT PANEL: 2D Editor & Color Palette -->
+            <section class="panel editor-panel">
+                <div class="panel-header">
+                    <h2>2D Configuration</h2>
+                    <p class="panel-desc">Paint the squares below to match your physical cube's current state.</p>
+                </div>
+
+                <!-- Interactive Color Palette -->
+                <div class="palette-container">
+                    <label>Select active color :</label>
+                    <div class="palette">
+                        <button class="color-btn active" data-color="U" style="background-color: #ffffff;"
+                            title="White (Up / U)"></button>
+                        <button class="color-btn" data-color="L" style="background-color: #f97316;"
+                            title="Orange (Left / L)"></button>
+                        <button class="color-btn" data-color="F" style="background-color: #22c55e;"
+                            title="Green (Front / F)"></button>
+                        <button class="color-btn" data-color="R" style="background-color: #ef4444;"
+                            title="Red (Right / R)"></button>
+                        <button class="color-btn" data-color="B" style="background-color: #3b82f6;"
+                            title="Blue (Back / B)"></button>
+                        <button class="color-btn" data-color="D" style="background-color: #ffea00;"
+                            title="Yellow (Down / D)"></button>
+                    </div>
+                </div>
+
+                <!-- Unfolded 2D Cross Net Layout -->
+                <div class="net-wrapper">
+                    <div class="cube-net" id="cube-net">
+                        <!-- 6 faces arranged in a grid by CSS, each holding 9 interactive buttons -->
+                        <div class="face face-u"></div>
+                        <div class="face face-l"></div>
+                        <div class="face face-f"></div>
+                        <div class="face face-r"></div>
+                        <div class="face face-b"></div>
+                        <div class="face face-d"></div>
+                    </div>
+                </div>
+
+                <!-- Editor Action Buttons -->
+                <div class="editor-actions">
+                    <button id="btn-reset" class="btn-secondary">🗑️ Reset to Solved</button>
+                    <button id="btn-random" class="btn-secondary">🎲 Random Scramble</button>
+                </div>
+
+                <!-- Verification Box (Crucial for validation status) -->
+                <div class="validation-box warning" id="validation-box">
+                    <span id="validation-message">Loading Rust/WASM Engine...</span>
+                </div>
+
+                <!-- Main Action Button -->
+                <button id="btn-solve" class="btn-primary" disabled>
+                    <span class="btn-text">Solve Cube</span>
+                    <div class="loader hidden"></div>
+                </button>
+            </section>
+
+            <!-- RIGHT PANEL: 3D Render & Interactive Player -->
+            <section class="panel visualizer-panel">
+                <div class="panel-header">
+                    <h2>3D Visualizer</h2>
+                    <p class="panel-desc">Interact with the 3D model. Rotate, zoom, and play the solving moves.</p>
+                </div>
+
+                <!-- Three.js Canvas Container -->
+                <div class="canvas-container" id="canvas-container">
+                    <div class="canvas-instructions">
+                        <span>🖱️ Left-Click + Drag: Rotate Camera</span>
+                        <span>🖱️ Right-Click + Drag: Pan Camera</span>
+                    </div>
+                </div>
+
+                <!-- Interactive Media Player for the solution moves (Horizontal Underneath) -->
+                <div id="player-panel" class="player-panel">
+                    <!-- Horizontal timeline list of solving moves -->
+                    <div class="timeline-container">
+                        <div class="moves-timeline" id="moves-timeline">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <p>Built with Rust 🦀, WebAssembly ⚡ & Three.js 📦</p>
+        </footer>
+    </div>
+
+    <!-- Hidden sync element for state management -->
+    <input type="hidden" id="cube-string" value="UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB">
+
+    <!-- External CDNs for 3D engine, camera controls and fluid animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <!-- Core JS Application -->
+    <script type="module" src="app.js"></script>
+</body>
+
+</html>

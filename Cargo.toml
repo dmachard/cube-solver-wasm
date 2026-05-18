@@ -1,0 +1,19 @@
+[package]
+name = "cube-solver-wasm"
+version = "0.1.0"
+edition = "2021"
+description = "A Rubik's Cube solver in Rust compiled to WebAssembly using Kociemba's two-phase algorithm."
+repository = "https://github.com/dmachard/cube-solver-wasm"
+license = "MIT"
+
+[lib]
+# for webassembly and standard rust library compilation
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# gateway between rust and js https://github.com/wasm-bindgen/wasm-bindgen
+wasm-bindgen = "0.2" 
+# rubiks cube solver in rust https://github.com/luckasRanarison/kewb
+kewb = "0.4.3"
+# for random generation https://github.com/rust-random/getrandom
+getrandom = { version = "0.3", features = ["wasm_js"] }
