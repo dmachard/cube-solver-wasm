@@ -1,6 +1,6 @@
 # Rubik's Cube Solver (WebAssembly & 3D)
 
-A fast, interactive 3D Rubik's Cube solver. It combines **Rust & WebAssembly** for high-performance solving (Kociemba's two-phase algorithm under 1ms) and **Three.js & GSAP** for smooth 3D animations and rendering.
+A fast, interactive 3D Rubik's Cube solver. It combines **Rust & WebAssembly** for high-performance solving (Kociemba's two-phase algorithm) and **Three.js & GSAP** for smooth 3D animations and rendering.
 
 > This project is a vibe coding project with Antigravity editor.
 
@@ -11,8 +11,7 @@ A fast, interactive 3D Rubik's Cube solver. It combines **Rust & WebAssembly** f
 - **Interactive 3D Visualizer**: Rotate, zoom, and inspect the cube using mouse or touch controls (Three.js).
 - **Intuitive 2D Editor**: Paint the cube facelet by facelet with real-time configuration validation.
 - **Smooth Animations**: Realistic slice rotations with GSAP.
-- **Step-by-Step Playback**: Play, pause, step forward/backward, and adjust playback speed of the solution.
-- **Mobile Friendly**: Designed to work beautifully on mobile, tablet, and desktop devices.
+- **Step-by-Step Playback**: Moves timeline
 
 ---
 

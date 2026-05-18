@@ -45,7 +45,7 @@ async function startApplication() {
         const boxEl = document.getElementById("validation-box");
         if (msgEl && boxEl) {
             boxEl.className = "validation-box error";
-            msgEl.textContent = "❌ Failed to load WASM engine. Check console errors.";
+            msgEl.textContent = "Failed to load WASM engine. Check console errors.";
         }
     }
 }
@@ -90,7 +90,7 @@ async function handleSolveClick() {
         // Handle mathematical unsolvable cases returned by the Rust crate
         if (resultString.startsWith("Error")) {
             validationBox.className = "validation-box error";
-            validationMsg.textContent = `❌ ${resultString}`;
+            validationMsg.textContent = `${resultString}`;
 
             // Reset player timeline to Étape 0
             showSolution("", 0);
@@ -110,7 +110,7 @@ async function handleSolveClick() {
         solveBtn.disabled = false;
 
         validationBox.className = "validation-box error";
-        validationMsg.textContent = "❌ An unexpected error occurred.";
+        validationMsg.textContent = "An unexpected error occurred.";
     }
 }
 

@@ -1,9 +1,9 @@
-use wasm_bindgen::prelude::*;
+use kewb::{CubieCube, DataTable, FaceCube, Solver};
 use std::sync::OnceLock;
-use kewb::{DataTable, FaceCube, Solver, CubieCube};
+use wasm_bindgen::prelude::*;
 
 // to store data in memory
-// OnceLock is a thread-safe container that guarantees that the tables will only be calculated once 
+// OnceLock is a thread-safe container that guarantees that the tables will only be calculated once
 // at the very first call to the function
 static SOLVER_TABLES: OnceLock<DataTable> = OnceLock::new();
 
@@ -11,9 +11,7 @@ static SOLVER_TABLES: OnceLock<DataTable> = OnceLock::new();
 #[wasm_bindgen]
 pub fn solve(cube_string: &str) -> String {
     // init tables
-    let tables = SOLVER_TABLES.get_or_init(|| {
-        DataTable::default()
-    });
+    let tables = SOLVER_TABLES.get_or_init(DataTable::default);
 
     // parse the 54 characters string from Kociemba (ex: "UUUU...")
     let face_cube = match FaceCube::try_from(cube_string) {

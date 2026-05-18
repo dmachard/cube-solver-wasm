@@ -20,5 +20,8 @@ fn test_invalid_cube_facets() {
     // A string of 54 characters but with invalid/impossible facelet count or setup
     let invalid_facets = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBC";
     let solution = solve(invalid_facets);
-    assert!(solution.contains("Error: Invalid string format.") || solution.contains("Error: Invalid configuration"));
+    assert!(
+        solution.contains("Error: Invalid string format.")
+            || solution.contains("Error: Invalid configuration")
+    );
 }
