@@ -7,6 +7,7 @@ import { init3DVisualizer } from './js/visualizer.js';
 import { init2DNet, validateCube, render2DNet } from './js/editor.js';
 import { initPlayerControls, showSolution } from './js/player.js';
 import { initLanguage, setLanguage, t } from './js/i18n.js';
+import { initThemeScheme, setThemeScheme } from './js/theme.js';
 
 let wasmModule = null;
 
@@ -15,6 +16,17 @@ let wasmModule = null;
  */
 async function startApplication() {
     try {
+        // Initialize Theme Scheme Support
+        initThemeScheme();
+        const themeSelect = document.getElementById("theme-select");
+        if (themeSelect) {
+            themeSelect.addEventListener("change", (e) => {
+                setThemeScheme(e.target.value);
+                render2DNet();
+                validateCube();
+            });
+        }
+
         // Initialize Language Support
         initLanguage();
         const langSelect = document.getElementById("lang-select");

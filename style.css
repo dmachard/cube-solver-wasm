@@ -31,6 +31,14 @@
     --warning-bg: #fffbeb;
 
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+    --color-u: #ffffff;
+    --border-u: #cbd5e1;
+    --color-l: #f97316;
+    --color-f: #10b981;
+    --color-r: #ef4444;
+    --color-b: #2563eb;
+    --color-d: #ffea00;
 }
 
 * {
@@ -324,14 +332,111 @@ body {
     outline-offset: 2px;
 }
 
+/* View Mode Toggle Group */
+.view-mode-container {
+    display: flex;
+    background-color: var(--accent-light);
+    border: 1px solid var(--border-standard);
+    border-radius: 10px;
+    padding: 4px;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.view-mode-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+}
+
+.view-mode-btn:hover {
+    color: var(--text-primary);
+}
+
+.view-mode-btn.active {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.hidden-view {
+    display: none !important;
+}
+
+/* 2D Unfolded Net Layout */
+.cube-net.unfolded-mode {
+    display: grid;
+    grid-template-columns: repeat(4, 95px);
+    grid-template-rows: repeat(3, 95px);
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+    margin: 0 auto;
+    flex-shrink: 0;
+}
+
+.cube-net.unfolded-mode .face {
+    display: grid !important; /* Force show all faces in unfolded mode */
+    width: 95px;
+    height: 95px;
+    padding: 4px;
+    gap: 2px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.cube-net.unfolded-mode .facelet {
+    border-radius: 2.5px;
+}
+
+/* Grid Positions for Unfolded Net */
+.cube-net.unfolded-mode .face-u { grid-row: 1; grid-column: 2; }
+.cube-net.unfolded-mode .face-l { grid-row: 2; grid-column: 1; }
+.cube-net.unfolded-mode .face-f { grid-row: 2; grid-column: 2; }
+.cube-net.unfolded-mode .face-r { grid-row: 2; grid-column: 3; }
+.cube-net.unfolded-mode .face-b { grid-row: 2; grid-column: 4; }
+.cube-net.unfolded-mode .face-d { grid-row: 3; grid-column: 2; }
+
+/* Responsive adjustments for Unfolded Net on smaller screens */
+@media (max-width: 576px) {
+    .cube-net.unfolded-mode {
+        grid-template-columns: repeat(4, 65px);
+        grid-template-rows: repeat(3, 65px);
+        gap: 4px;
+    }
+    .cube-net.unfolded-mode .face {
+        width: 65px;
+        height: 65px;
+        padding: 2px;
+        gap: 1px;
+        border-radius: 4px;
+    }
+    .cube-net.unfolded-mode .facelet {
+        border-radius: 1.5px;
+    }
+}
+
 /* 2D Single Face Net Container */
 .net-wrapper {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start; /* safe for overflow scroll */
     align-items: center;
     padding: 20px 0;
     overflow-x: auto;
     flex-shrink: 0;
+    width: 100%;
 }
 
 .cube-net.single-face-mode {
@@ -339,6 +444,8 @@ body {
     justify-content: center;
     align-items: center;
     width: 100%;
+    margin: 0 auto;
+    flex-shrink: 0;
 }
 
 .face {
@@ -378,32 +485,120 @@ body {
     cursor: not-allowed !important;
     transform: none !important;
     filter: none !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: rgba(0, 0, 0, 0.45);
+    text-shadow: 0 1.5px 1.5px rgba(255, 255, 255, 0.3);
 }
 
 /* Clear, flat high-contrast Rubik's colors */
 .c-u {
-    background-color: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
+    background-color: var(--color-u) !important;
+    border: 1px solid var(--border-u) !important;
 }
 
 .c-l {
-    background-color: #f97316 !important;
+    background-color: var(--color-l) !important;
 }
 
 .c-f {
-    background-color: #10b981 !important;
+    background-color: var(--color-f) !important;
 }
 
 .c-r {
-    background-color: #ef4444 !important;
+    background-color: var(--color-r) !important;
 }
 
 .c-b {
-    background-color: #2563eb !important;
+    background-color: var(--color-b) !important;
 }
 
 .c-d {
-    background-color: #ffea00 !important;
+    background-color: var(--color-d) !important;
+}
+
+/* Theme Custom Color Configurator */
+.theme-config-panel {
+    background-color: var(--accent-light);
+    border: 1px solid var(--border-standard);
+    border-radius: 12px;
+    padding: 14px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    transition: all 0.2s ease;
+}
+
+.theme-config-panel.hidden {
+    display: none;
+}
+
+.config-title-row h4 {
+    margin: 0 0 10px 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.config-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+@media (max-width: 480px) {
+    .config-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.config-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-surface);
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-standard);
+}
+
+.config-item span {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.config-item .color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.config-item input[type="color"] {
+    -webkit-appearance: none;
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    background: none;
+    margin-left: auto;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.config-item input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.config-item input[type="color"]::-webkit-color-swatch {
+    border: 1px solid var(--border-standard);
+    border-radius: 4px;
 }
 
 /* Editor Secondary Actions */

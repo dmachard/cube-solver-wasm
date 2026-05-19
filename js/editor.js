@@ -51,8 +51,50 @@ export function init2DNet() {
         stopActivePlayback();
     });
 
-    // 4. Initial load: Set cube to solved state
+    // 4. Setup View Mode Toggle (Single vs Unfolded)
+    const btnSingle = document.getElementById("btn-view-single");
+    const btnUnfolded = document.getElementById("btn-view-unfolded");
+    if (btnSingle && btnUnfolded) {
+        btnSingle.addEventListener("click", () => setViewMode("single"));
+        btnUnfolded.addEventListener("click", () => setViewMode("unfolded"));
+    }
+
+    // Determine initial view mode
+    const savedMode = localStorage.getItem("cube-solver-view-mode");
+    const initialMode = savedMode || (window.innerWidth <= 576 ? "single" : "unfolded");
+    setViewMode(initialMode);
+
+    // 5. Initial load: Set cube to solved state
     resetCubeToSolved();
+}
+
+/**
+ * Switch view mode of the 2D Net editor
+ */
+export function setViewMode(mode) {
+    const net = document.getElementById("cube-net");
+    const faceGroup = document.getElementById("face-selector-group");
+    const btnSingle = document.getElementById("btn-view-single");
+    const btnUnfolded = document.getElementById("btn-view-unfolded");
+
+    if (!net || !btnSingle || !btnUnfolded) return;
+
+    if (mode === "unfolded") {
+        net.classList.remove("single-face-mode");
+        net.classList.add("unfolded-mode");
+        if (faceGroup) faceGroup.classList.add("hidden-view");
+        
+        btnSingle.classList.remove("active");
+        btnUnfolded.classList.add("active");
+    } else {
+        net.classList.remove("unfolded-mode");
+        net.classList.add("single-face-mode");
+        if (faceGroup) faceGroup.classList.remove("hidden-view");
+        
+        btnUnfolded.classList.remove("active");
+        btnSingle.classList.add("active");
+    }
+    localStorage.setItem("cube-solver-view-mode", mode);
 }
 
 /**
@@ -99,6 +141,7 @@ export function render2DNet() {
             if (i === 4) {
                 btn.classList.add("center-lock");
                 btn.title = `${t('fixed-center')} ${t('face-' + faceName.toLowerCase())}`;
+                btn.textContent = faceName;
             } else {
                 // Interactive painting click event
                 btn.addEventListener("click", (e) => {
@@ -143,8 +186,8 @@ export function validateCube() {
         const count = counts[faceChar];
         if (count !== 9) {
             isValid = false;
-            const colorName = t(`color-${getColorName(faceChar).toLowerCase()}`);
-            errors.push(`${colorName}: ${count}/9 ${t('squares')}`);
+            const faceName = t(`face-${faceChar.toLowerCase()}`);
+            errors.push(`${faceName}: ${count}/9 ${t('squares')}`);
         }
     });
 

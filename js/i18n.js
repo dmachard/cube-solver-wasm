@@ -24,6 +24,11 @@ export const translations = {
         "made-by": "Made by",
         "vibe-coded": "vibe coded",
         "unexpected-error": "An unexpected error occurred.",
+        "scheme-standard": "Standard Colors",
+        "scheme-custom": "Custom Colors",
+        "custom-colors-title": "Customize colors:",
+        "view-single": "Face by Face",
+        "view-unfolded": "Unfolded Net",
         
         // Colors
         "color-white": "White",
@@ -81,6 +86,11 @@ export const translations = {
         "made-by": "Créé par",
         "vibe-coded": "codé au feeling",
         "unexpected-error": "Une erreur inattendue est survenue.",
+        "scheme-standard": "Couleurs standards",
+        "scheme-custom": "Couleurs persos",
+        "custom-colors-title": "Personnaliser les couleurs :",
+        "view-single": "Face par face",
+        "view-unfolded": "Patron déplié",
         
         // Colors
         "color-white": "Blanc",
