@@ -166,11 +166,15 @@ function updateTimelineHighlights() {
             activeNode.classList.add("active");
 
             // Auto scroll timeline container horizontally to keep active step centered ("au milieu")
-            activeNode.scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest',
-                inline: 'center'
-            });
+            const timelineContainer = document.querySelector('.timeline-container');
+            if (timelineContainer) {
+                const nodeCenter = activeNode.offsetLeft + (activeNode.offsetWidth / 2);
+                const containerCenter = timelineContainer.offsetWidth / 2;
+                timelineContainer.scrollTo({
+                    left: nodeCenter - containerCenter,
+                    behavior: 'smooth'
+                });
+            }
         }
 
         // Add completed class to all step nodes that represent steps already completed

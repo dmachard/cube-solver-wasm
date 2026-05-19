@@ -62,60 +62,69 @@ body {
     gap: 40px;
 }
 
-header {
-    position: relative;
-    text-align: left;
-    /* Aligned left like modern apps */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     border-bottom: 1px solid var(--border-standard);
-    padding-bottom: 24px;
+    padding-bottom: 20px;
 }
 
-.github-link {
-    position: absolute;
-    top: 0;
-    right: 0;
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon {
+    color: var(--accent);
+}
+
+.navbar h1 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-item {
     color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
     transition: color 0.15s ease, transform 0.15s ease;
     display: flex;
     align-items: center;
     gap: 8px;
-    text-decoration: none;
-    font-size: 0.88rem;
-    font-weight: 500;
 }
 
-.github-link:hover {
+.nav-item:hover {
     color: var(--text-primary);
     transform: translateY(-1.5px);
 }
 
 .github-link svg {
-    width: 20px;
-    height: 20px;
     fill: currentColor;
 }
 
 @media (max-width: 576px) {
-    .github-link span {
+    .nav-item span {
         display: none;
     }
-}
-
-.logo {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    margin-bottom: 6px;
-}
-
-h1 {
-    font-size: 2.25rem;
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    color: var(--text-primary);
-    margin-bottom: 8px;
+    .navbar h1 {
+        font-size: 1.4rem;
+    }
+    .logo-icon {
+        width: 24px;
+        height: 24px;
+    }
 }
 
 .subtitle {
@@ -135,18 +144,31 @@ h1 {
 }
 
 @media (max-width: 968px) {
+    .app-container {
+        padding: 30px 15px;
+    }
+
     .workspace {
-        grid-template-columns: 1fr;
-        /* Stack vertically on tablets and mobile */
+        display: flex;
+        flex-direction: row;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        gap: 20px;
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+
+    .workspace::-webkit-scrollbar {
+        display: none; /* Chrome, Safari and Opera */
     }
 
     .panel {
+        flex: 0 0 100%;
+        min-width: 100%;
+        scroll-snap-align: start;
         height: auto !important;
         /* Allow panels to adapt to content size on mobile */
-    }
-
-    .app-container {
-        padding: 30px 15px;
     }
 }
 
@@ -164,8 +186,9 @@ h1 {
     gap: 28px;
     min-width: 0;
     /* Prevents grid/flex items from expanding past their columns */
-    height: 820px;
-    /* Highly generous locked height to prevent any possible cutoff and guarantee symmetry */
+    min-height: 820px;
+    height: auto;
+    /* Prevent cutoff on smaller PC heights and guarantee symmetry */
 }
 
 /* Explicit class for the 3D visualizer to lock its dimensions */
@@ -190,6 +213,56 @@ h1 {
 /* ==========================================================================
    4. Left Panel: 2D Editor & Palette
    ========================================================================== */
+
+/* Face Selector */
+.face-selector-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.face-selector-container label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+}
+
+.face-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.face-tab {
+    width: auto;
+    padding: 0 14px;
+    height: 38px;
+    border-radius: 8px;
+    border: 1px solid var(--border-standard);
+    background-color: var(--bg-surface);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.face-tab:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.face-tab.active {
+    background-color: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
 .palette-container {
     display: flex;
     flex-direction: column;
@@ -227,66 +300,40 @@ h1 {
     outline-offset: 2px;
 }
 
-/* 2D Cross Net Container */
+/* 2D Single Face Net Container */
 .net-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 12px 0;
+    padding: 20px 0;
     overflow-x: auto;
+    flex-shrink: 0;
 }
 
-.cube-net {
-    display: grid;
-    grid-template-columns: repeat(4, 90px);
-    grid-template-rows: repeat(3, 90px);
-    gap: 8px;
-    width: max-content;
-}
-
-/* Position 6 faces on cross grid */
-.face-u {
-    grid-column: 2;
-    grid-row: 1;
-}
-
-.face-l {
-    grid-column: 1;
-    grid-row: 2;
-}
-
-.face-f {
-    grid-column: 2;
-    grid-row: 2;
-}
-
-.face-r {
-    grid-column: 3;
-    grid-row: 2;
-}
-
-.face-b {
-    grid-column: 4;
-    grid-row: 2;
-}
-
-.face-d {
-    grid-column: 2;
-    grid-row: 3;
+.cube-net.single-face-mode {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }
 
 .face {
-    display: grid;
+    display: none; /* hidden by default in single face mode */
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    gap: 2px;
+    gap: 4px;
     background: #f1f5f9;
-    /* Soft background border for the cubies */
     border: 1px solid var(--border-standard);
-    border-radius: 6px;
-    padding: 4px;
-    width: 90px;
-    height: 90px;
+    border-radius: 12px;
+    padding: 8px;
+    width: 220px;
+    height: 220px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.face.active-face {
+    display: grid;
+    animation: fadeIn 0.3s ease;
 }
 
 /* Individual facelet buttons */
@@ -457,25 +504,6 @@ h1 {
     cursor: grabbing;
 }
 
-.canvas-instructions {
-    position: absolute;
-    bottom: 12px;
-    left: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    pointer-events: none;
-}
-
-.canvas-instructions span {
-    font-size: 0.7rem;
-    color: #64748b;
-    background: rgba(15, 23, 42, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 3px 6px;
-    border-radius: 4px;
-}
-
 @media (max-width: 480px) {
     .visualizer-panel {
         height: 520px;
@@ -531,7 +559,8 @@ h1 {
     align-items: center;
     gap: 22px;
     width: max-content;
-    padding: 6px 16px; /* Generous 16px padding on left/right to prevent any active halo shadow cutoff! */
+    padding: 6px 16px;
+    /* Generous 16px padding on left/right to prevent any active halo shadow cutoff! */
     position: relative;
 }
 
@@ -540,8 +569,10 @@ h1 {
     content: '';
     position: absolute;
     top: 50%;
-    left: 35px; /* Aligns perfectly with the center of the first circle (16px padding + 19px half-width) */
-    right: 35px; /* Aligns perfectly with the center of the last circle (16px padding + 19px half-width) */
+    left: 35px;
+    /* Aligns perfectly with the center of the first circle (16px padding + 19px half-width) */
+    right: 35px;
+    /* Aligns perfectly with the center of the last circle (16px padding + 19px half-width) */
     height: 3px;
     background: var(--border-standard);
     transform: translateY(-50%);

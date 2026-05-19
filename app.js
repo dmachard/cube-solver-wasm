@@ -107,6 +107,12 @@ async function handleSolveClick() {
 
             // Populate and reveal solution timeline
             showSolution(resultString, solveTimeMs);
+
+            // Scroll to 3D visualizer panel on mobile devices
+            const visualizerPanel = document.querySelector('.visualizer-panel');
+            if (visualizerPanel && window.innerWidth <= 968) {
+                visualizerPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+            }
         }
 
     } catch (err) {

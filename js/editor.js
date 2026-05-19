@@ -17,7 +17,27 @@ export function init2DNet() {
         });
     });
 
-    // 2. Setup Reset Button
+    // 2. Setup Face Selector Tabs
+    const faceTabs = document.querySelectorAll(".face-tab");
+    faceTabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            // Update Active Tab Button
+            faceTabs.forEach(t => t.classList.remove("active"));
+            tab.classList.add("active");
+
+            // Update Active Face in the Net
+            const selectedFace = tab.dataset.face;
+            const faces = document.querySelectorAll(".face");
+            faces.forEach(f => {
+                f.classList.remove("active-face");
+                if (f.classList.contains(`face-${selectedFace}`)) {
+                    f.classList.add("active-face");
+                }
+            });
+        });
+    });
+
+    // 3. Setup Reset Button
     document.getElementById("btn-reset").addEventListener("click", () => {
         resetCubeToSolved();
         // Clear any solution active playback
