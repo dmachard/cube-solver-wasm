@@ -114,6 +114,30 @@ body {
     fill: currentColor;
 }
 
+.lang-select {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-standard);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    outline: none;
+    font-family: inherit;
+}
+
+.lang-select:hover {
+    color: var(--text-primary);
+    border-color: var(--text-secondary);
+}
+
+.lang-select option {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+}
+
 @media (max-width: 576px) {
     .nav-item span {
         display: none;

@@ -2,6 +2,7 @@ import { FACE_ORDER, FACELET_OFFSET, state } from './constants.js';
 import { build3DCube, update3DCubeColors, extract2DStateFrom3D } from './visualizer.js';
 import { applyMoveInstantly3D } from './rotations.js';
 import { showSolution } from './player.js';
+import { t } from './i18n.js';
 
 /**
  * Initializes the 2D Net Editor, color palette and action buttons
@@ -97,7 +98,7 @@ export function render2DNet() {
             // Lock central facelets (index 4 in each 0-8 face offset) to prevent illegal centers
             if (i === 4) {
                 btn.classList.add("center-lock");
-                btn.title = `Fixed center: ${faceName}`;
+                btn.title = `${t('fixed-center')} ${t('face-' + faceName.toLowerCase())}`;
             } else {
                 // Interactive painting click event
                 btn.addEventListener("click", (e) => {
@@ -142,18 +143,18 @@ export function validateCube() {
         const count = counts[faceChar];
         if (count !== 9) {
             isValid = false;
-            const colorName = getColorName(faceChar);
-            errors.push(`${colorName}: ${count}/9 squares`);
+            const colorName = t(`color-${getColorName(faceChar).toLowerCase()}`);
+            errors.push(`${colorName}: ${count}/9 ${t('squares')}`);
         }
     });
 
     if (isValid) {
         validationBox.className = "validation-box success";
-        validationMsg.textContent = "✓ WASM Ready (exactly 9 squares per color).";
+        validationMsg.textContent = t('wasm-ready');
         solveBtn.disabled = false;
     } else {
         validationBox.className = "validation-box warning";
-        validationMsg.textContent = `⚠️ Invalid counts: ${errors.join(', ')}`;
+        validationMsg.textContent = `${t('invalid-counts')}${errors.join(', ')}`;
         solveBtn.disabled = true;
     }
 }

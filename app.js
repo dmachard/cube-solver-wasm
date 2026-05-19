@@ -4,8 +4,9 @@ import init, { solve, version } from './pkg/cube_solver_wasm.js';
 // 2. Import our clean modular specialized scripts
 import { state } from './js/constants.js';
 import { init3DVisualizer } from './js/visualizer.js';
-import { init2DNet, validateCube } from './js/editor.js';
+import { init2DNet, validateCube, render2DNet } from './js/editor.js';
 import { initPlayerControls, showSolution } from './js/player.js';
+import { initLanguage, setLanguage, t } from './js/i18n.js';
 
 let wasmModule = null;
 
@@ -14,6 +15,17 @@ let wasmModule = null;
  */
 async function startApplication() {
     try {
+        // Initialize Language Support
+        initLanguage();
+        const langSelect = document.getElementById("lang-select");
+        if (langSelect) {
+            langSelect.addEventListener("change", (e) => {
+                setLanguage(e.target.value);
+                render2DNet();
+                validateCube();
+            });
+        }
+
         // 1. Initialize our modular components in order
         init3DVisualizer();
         init2DNet();
@@ -35,7 +47,7 @@ async function startApplication() {
         // Update the validation message once Rust engine is online
         const msgEl = document.getElementById("validation-message");
         if (msgEl) {
-            msgEl.textContent = "✓ WASM Rust Engine loaded successfully.";
+            msgEl.textContent = t("wasm-loaded");
         }
 
         // Run initial validation to enable buttons
@@ -51,7 +63,7 @@ async function startApplication() {
         const boxEl = document.getElementById("validation-box");
         if (msgEl && boxEl) {
             boxEl.className = "validation-box error";
-            msgEl.textContent = "Failed to load WASM engine. Check console errors.";
+            msgEl.textContent = t("wasm-failed");
         }
     }
 }
@@ -73,7 +85,7 @@ async function handleSolveClick() {
         // Show spinner loader state
         solveBtn.disabled = true;
         loader.classList.remove("hidden");
-        btnText.textContent = "Solving with Rust...";
+        btnText.textContent = t("solving");
 
         // Convert the 2D array representation into a 54-char string for Kociemba
         const cubeString = state.cubeState.join('');
@@ -90,7 +102,7 @@ async function handleSolveClick() {
 
         // Restore button state
         loader.classList.add("hidden");
-        btnText.textContent = "Solve Cube";
+        btnText.textContent = t("solve-cube");
         solveBtn.disabled = false;
 
         // Handle mathematical unsolvable cases returned by the Rust crate
@@ -103,7 +115,7 @@ async function handleSolveClick() {
         } else {
             // Success! Send solution moves to our timeline player
             validationBox.className = "validation-box success";
-            validationMsg.textContent = "✓ Solution found!";
+            validationMsg.textContent = t("solution-found");
 
             // Populate and reveal solution timeline
             showSolution(resultString, solveTimeMs);
@@ -118,11 +130,11 @@ async function handleSolveClick() {
     } catch (err) {
         console.error("An unexpected error occurred during solving:", err);
         loader.classList.add("hidden");
-        btnText.textContent = "Solve Cube";
+        btnText.textContent = t("solve-cube");
         solveBtn.disabled = false;
 
         validationBox.className = "validation-box error";
-        validationMsg.textContent = "An unexpected error occurred.";
+        validationMsg.textContent = t("unexpected-error");
     }
 }
 
