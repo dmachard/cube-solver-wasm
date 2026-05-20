@@ -2,6 +2,8 @@ use kewb::{CubieCube, DataTable, FaceCube, Solver};
 use std::sync::OnceLock;
 use wasm_bindgen::prelude::*;
 
+pub mod pyraminx;
+
 // to store data in memory
 // OnceLock is a thread-safe container that guarantees that the tables will only be calculated once
 // at the very first call to the function
@@ -39,8 +41,15 @@ pub fn solve(cube_string: &str) -> String {
     }
 }
 
+/// Solve the Pyraminx state
+#[wasm_bindgen]
+pub fn solve_pyraminx(cube_string: &str) -> String {
+    pyraminx::solve(cube_string)
+}
+
 /// Expose the package version defined in Cargo.toml at compile time
 #[wasm_bindgen]
 pub fn version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
 }
+
