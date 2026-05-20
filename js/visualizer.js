@@ -49,6 +49,62 @@ export function init3DVisualizer() {
     // 6. Build the initial 3D Cube Meshes
     build3DCube();
 
+    // Click-to-paint on 3D Rubik's Cube
+    let startX = 0;
+    let startY = 0;
+    let startTime = 0;
+
+    const onPointerDown = (e) => {
+        startX = e.clientX;
+        startY = e.clientY;
+        startTime = Date.now();
+    };
+
+    const onPointerUp = (e) => {
+        const diffX = Math.abs(e.clientX - startX);
+        const diffY = Math.abs(e.clientY - startY);
+        const duration = Date.now() - startTime;
+
+        // Count as a click if the mouse moved less than 5px and took less than 350ms
+        if (diffX < 5 && diffY < 5 && duration < 350) {
+            const rect = renderer.domElement.getBoundingClientRect();
+            const mouse = new THREE.Vector2(
+                ((e.clientX - rect.left) / rect.width) * 2 - 1,
+                -((e.clientY - rect.top) / rect.height) * 2 + 1
+            );
+
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(mouse, camera);
+
+            // Intersect with cubies
+            const intersects = raycaster.intersectObjects(cubies);
+
+            if (intersects.length > 0) {
+                const hit = intersects[0];
+                const cubie = hit.object;
+                const faceIndex = hit.faceIndex;
+                const matIdx = Math.floor(faceIndex / 2);
+
+                // Get current active color from state
+                const activeColorHex = COLOR_HEX_MAP[state.activeColor];
+                if (activeColorHex) {
+                    // Update material color of the clicked face
+                    cubie.material[matIdx].color.set(activeColorHex);
+
+                    // Sync changes back to 2D state
+                    extract2DStateFrom3D();
+
+                    // Update 2D editor net and validate
+                    if (window.render2DNet) window.render2DNet();
+                    if (window.validateCube) window.validateCube();
+                }
+            }
+        }
+    };
+
+    renderer.domElement.addEventListener('pointerdown', onPointerDown);
+    renderer.domElement.addEventListener('pointerup', onPointerUp);
+
     // 7. Start the continuous rendering animation loop
     animate();
 
@@ -297,4 +353,52 @@ export function extract2DStateFrom3D() {
     }
 
     state.cubeState = tempState;
+}
+
+/**
+ * Rotates the 3D cube camera around the Y-axis by 90 degrees left or right
+ */
+export function rotateCubeCamera(direction) {
+    if (!camera || !controls) return;
+
+    const angleDiff = direction === 'left' ? (Math.PI / 2) : (-Math.PI / 2);
+
+    const x = camera.position.x;
+    const z = camera.position.z;
+    const r = Math.sqrt(x * x + z * z);
+    const startAngle = Math.atan2(z, x);
+    const targetAngle = startAngle + angleDiff;
+
+    const animObj = { angle: startAngle };
+
+    gsap.to(animObj, {
+        angle: targetAngle,
+        duration: 0.5,
+        ease: "power2.out",
+        onUpdate: () => {
+            camera.position.x = r * Math.cos(animObj.angle);
+            camera.position.z = r * Math.sin(animObj.angle);
+            camera.lookAt(0, 0, 0);
+            controls.update();
+        }
+    });
+}
+
+/**
+ * Resets the 3D cube camera position to the default angle
+ */
+export function resetCubeCamera() {
+    if (!camera || !controls) return;
+
+    gsap.to(camera.position, {
+        x: 5,
+        y: 5,
+        z: 8,
+        duration: 0.5,
+        ease: "power2.out",
+        onUpdate: () => {
+            camera.lookAt(0, 0, 0);
+            controls.update();
+        }
+    });
 }

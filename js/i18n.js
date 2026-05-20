@@ -2,6 +2,8 @@ export const translations = {
     en: {
         title: "Rubik's Solver",
         "title-desc": "3D Rubik's Cube Solver",
+        "puzzle-cube": "Rubik's 3×3",
+        "puzzle-pyraminx": "Pyraminx",
         "2d-config": "2D Configuration",
         "2d-desc": "Paint the squares below to match your physical cube's current state.",
         "select-face": "Select face to edit:",
@@ -59,11 +61,19 @@ export const translations = {
         "color-f-desc": "Green (Front / F)",
         "color-r-desc": "Red (Right / R)",
         "color-b-desc": "Blue (Back / B)",
-        "color-d-desc": "Yellow (Down / D)"
+        "color-d-desc": "Yellow (Down / D)",
+        "pyraminx-legend-title": "💡 How to find your way on the pyramid:",
+        "pyraminx-legend-desc": "Each face of the solver is named after the corner (Tip) opposite to it. Turning a corner rotates the other 3 faces, but does not affect the face opposite to it.",
+        "pyraminx-legend-u": "U: Blue face (located at the Bottom, opposite to top Up corner)",
+        "pyraminx-legend-l": "L: Yellow face (located at the Back-Right, opposite to bottom-left Left corner)",
+        "pyraminx-legend-r": "R: Red face (located at the Back-Left, opposite to bottom-right Right corner)",
+        "pyraminx-legend-b": "B: Green face (located at the Front, opposite to Back corner)"
     },
     fr: {
         title: "Solveur Rubik's",
         "title-desc": "Solveur de Rubik's Cube 3D",
+        "puzzle-cube": "Rubik's 3×3",
+        "puzzle-pyraminx": "Pyraminx",
         "2d-config": "Configuration 2D",
         "2d-desc": "Coloriez les carrés ci-dessous pour correspondre à l'état de votre cube physique.",
         "select-face": "Sélectionner la face à éditer :",
@@ -121,7 +131,13 @@ export const translations = {
         "color-f-desc": "Vert (Devant / F)",
         "color-r-desc": "Rouge (Droite / R)",
         "color-b-desc": "Bleu (Arrière / B)",
-        "color-d-desc": "Jaune (Bas / D)"
+        "color-d-desc": "Jaune (Bas / D)",
+        "pyraminx-legend-title": "💡 Comment s'y retrouver sur la pyramide :",
+        "pyraminx-legend-desc": "Chaque face du solveur est nommée d'après le sommet (Tip) qui lui est opposé. Faire tourner un sommet fait pivoter les 3 autres faces, mais ne modifie jamais la face qui lui fait face.",
+        "pyraminx-legend-u": "U : Face Bleue (située en Bas, opposée au sommet Haut)",
+        "pyraminx-legend-l": "L : Face Jaune (située à l'Arrière-Droit, opposée au sommet Gauche)",
+        "pyraminx-legend-r": "R : Face Rouge (située à l'Arrière-Gauche, opposée au sommet Droite)",
+        "pyraminx-legend-b": "B : Face Verte (située Devant, opposée au sommet Arrière)"
     }
 };
 

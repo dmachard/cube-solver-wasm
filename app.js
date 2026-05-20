@@ -1,15 +1,65 @@
 // 1. Import standard compiled WebAssembly JS bindings from wasm-pack
-import init, { solve, version } from './pkg/cube_solver_wasm.js';
+import init, { solve, solve_pyraminx, version } from './pkg/cube_solver_wasm.js';
 
 // 2. Import our clean modular specialized scripts
 import { state } from './js/constants.js';
-import { init3DVisualizer } from './js/visualizer.js';
-import { init2DNet, validateCube, render2DNet } from './js/editor.js';
+import { init3DVisualizer, rotateCubeCamera, resetCubeCamera } from './js/visualizer.js';
+import { init2DNet, validateCube, render2DNet, resetCubeToSolved, generateRandomValidState } from './js/editor.js';
 import { initPlayerControls, showSolution } from './js/player.js';
 import { initLanguage, setLanguage, t } from './js/i18n.js';
 import { initThemeScheme, setThemeScheme } from './js/theme.js';
 
+// 3. Import Pyraminx-specific modules (separate files)
+import { initPyraminxEditor, renderPyraminxNet, validatePyraminx, resetPyraminxToSolved, generateRandomPyraminxState } from './js/pyraminx-editor.js';
+import { initPyraminx3D, rotatePyraminxCamera, resetPyraminxCamera } from './js/pyraminx-visualizer.js';
+
 let wasmModule = null;
+let pyraminx3DInitialized = false;
+
+/**
+ * Switches puzzle type between 'cube' and 'pyraminx'
+ */
+function setPuzzleType(type) {
+    if (state.puzzleType === type) return;
+    state.puzzleType = type;
+
+    // Update toggle buttons
+    document.querySelectorAll('.puzzle-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.puzzle === type);
+    });
+
+    // Toggle visibility of cube vs pyraminx UI
+    const cubeMode = document.getElementById('cube-mode');
+    const pyraminxMode = document.getElementById('pyraminx-mode');
+    const cubeCanvas = document.getElementById('canvas-container');
+    const pyraminxCanvas = document.getElementById('pyraminx-canvas-container');
+
+    if (type === 'pyraminx') {
+        cubeMode.classList.add('hidden');
+        pyraminxMode.classList.remove('hidden');
+        cubeCanvas.classList.add('hidden');
+        pyraminxCanvas.classList.remove('hidden');
+
+        // Reset state to Pyraminx solved state before building the 3D model
+        resetPyraminxToSolved();
+
+        // Initialize Pyraminx 3D on first switch
+        if (!pyraminx3DInitialized) {
+            initPyraminx3D();
+            pyraminx3DInitialized = true;
+        }
+    } else {
+        cubeMode.classList.remove('hidden');
+        pyraminxMode.classList.add('hidden');
+        cubeCanvas.classList.remove('hidden');
+        pyraminxCanvas.classList.add('hidden');
+
+        resetCubeToSolved();
+    }
+
+    // Reset solution player
+    showSolution("", 0);
+}
 
 /**
  * Main application Entry Point
@@ -33,15 +83,36 @@ async function startApplication() {
         if (langSelect) {
             langSelect.addEventListener("change", (e) => {
                 setLanguage(e.target.value);
-                render2DNet();
-                validateCube();
+                if (state.puzzleType === 'pyraminx') {
+                    renderPyraminxNet();
+                    validatePyraminx();
+                } else {
+                    render2DNet();
+                    validateCube();
+                }
             });
         }
+
+        // Initialize Puzzle Type Selector
+        const btnCube = document.getElementById("btn-puzzle-cube");
+        const btnPyraminx = document.getElementById("btn-puzzle-pyraminx");
+        if (btnCube) btnCube.addEventListener("click", () => setPuzzleType("cube"));
+        if (btnPyraminx) btnPyraminx.addEventListener("click", () => setPuzzleType("pyraminx"));
 
         // 1. Initialize our modular components in order
         init3DVisualizer();
         init2DNet();
+        initPyraminxEditor();
         initPlayerControls();
+
+        // 3D Camera Rotation Controls Click Listeners
+        document.getElementById("btn-cube-rotate-left").addEventListener("click", () => rotateCubeCamera("left"));
+        document.getElementById("btn-cube-rotate-right").addEventListener("click", () => rotateCubeCamera("right"));
+        document.getElementById("btn-cube-reset-view").addEventListener("click", () => resetCubeCamera());
+
+        document.getElementById("btn-pyra-rotate-left").addEventListener("click", () => rotatePyraminxCamera("left"));
+        document.getElementById("btn-pyra-rotate-right").addEventListener("click", () => rotatePyraminxCamera("right"));
+        document.getElementById("btn-pyra-reset-view").addEventListener("click", () => resetPyraminxCamera());
 
         // Initialize timeline to Étape 0 immediately on startup so it is always visible!
         showSolution("", 0);
@@ -68,6 +139,26 @@ async function startApplication() {
         // 3. Bind the main Solve button click listener
         const solveBtn = document.getElementById("btn-solve");
         solveBtn.addEventListener("click", handleSolveClick);
+
+        // 4. Bind Reset and Scramble buttons (route to correct puzzle type)
+        document.getElementById("btn-reset").addEventListener("click", () => {
+            if (state.puzzleType === 'pyraminx') {
+                resetPyraminxToSolved();
+            } else {
+                resetCubeToSolved();
+            }
+            showSolution("", 0);
+        });
+
+        document.getElementById("btn-random").addEventListener("click", () => {
+            if (state.puzzleType === 'pyraminx') {
+                // Generate a random pyraminx scramble and apply it
+                generateRandomPyraminxState(11);
+            } else {
+                generateRandomValidState();
+            }
+            showSolution("", 0);
+        });
 
     } catch (err) {
         console.error("Failed to initialize WebAssembly module:", err);
@@ -99,14 +190,20 @@ async function handleSolveClick() {
         loader.classList.remove("hidden");
         btnText.textContent = t("solving");
 
-        // Convert the 2D array representation into a 54-char string for Kociemba
+        // Convert the state array to string
         const cubeString = state.cubeState.join('');
+        console.log(`[Solve] puzzleType=${state.puzzleType}, stateString="${cubeString}" (length=${cubeString.length})`);
 
         // Benchmark performance start
         const t0 = performance.now();
 
-        // NATIVE CALL TO RUST SOLVER!
-        const resultString = solve(cubeString);
+        // NATIVE CALL TO RUST SOLVER! (choose solver based on puzzle type)
+        let resultString;
+        if (state.puzzleType === 'pyraminx') {
+            resultString = solve_pyraminx(cubeString);
+        } else {
+            resultString = solve(cubeString);
+        }
 
         // Benchmark performance end
         const t1 = performance.now();

@@ -38,18 +38,7 @@ export function init2DNet() {
         });
     });
 
-    // 3. Setup Reset Button
-    document.getElementById("btn-reset").addEventListener("click", () => {
-        resetCubeToSolved();
-        // Clear any solution active playback
-        stopActivePlayback();
-    });
-
-    // 3. Setup Scramble Button
-    document.getElementById("btn-random").addEventListener("click", () => {
-        generateRandomValidState();
-        stopActivePlayback();
-    });
+    // Note: Reset and Scramble buttons are bound in app.js for puzzle-type routing
 
     // 4. Setup View Mode Toggle (Single vs Unfolded)
     const btnSingle = document.getElementById("btn-view-single");
@@ -238,3 +227,6 @@ export function generateRandomValidState() {
     render2DNet();
     validateCube();
 }
+
+window.render2DNet = render2DNet;
+window.validateCube = validateCube;

@@ -1,5 +1,6 @@
 import { state } from './constants.js';
 import { animateMove, applyMoveInstantly3D } from './rotations.js';
+import { animatePyraminxMove, applyPyraminxMoveInstant } from './pyraminx-visualizer.js';
 
 
 /**
@@ -73,8 +74,12 @@ async function stepForward() {
     const move = state.solutionMoves[state.currentMoveIndex];
     const duration = getAnimationDuration();
 
-    // Trigger slice rotation animation
-    await animateMove(move, duration);
+    // Trigger slice rotation animation (route to pyraminx if needed)
+    if (state.puzzleType === 'pyraminx') {
+        await animatePyraminxMove(move, duration);
+    } else {
+        await animateMove(move, duration);
+    }
 
     updateTimelineHighlights();
 }
@@ -92,7 +97,11 @@ async function stepBackward() {
     const inverseMove = getInverseMove(move);
 
     // Trigger inverse slice rotation animation
-    await animateMove(inverseMove, duration);
+    if (state.puzzleType === 'pyraminx') {
+        await animatePyraminxMove(inverseMove, duration);
+    } else {
+        await animateMove(inverseMove, duration);
+    }
 
     state.currentMoveIndex--;
     updateTimelineHighlights();
@@ -134,14 +143,22 @@ export function jumpToStepInstant(targetIndex) {
         while (state.currentMoveIndex < targetIndex) {
             state.currentMoveIndex++;
             const move = state.solutionMoves[state.currentMoveIndex];
-            applyMoveInstantly3D(move);
+            if (state.puzzleType === 'pyraminx') {
+                applyPyraminxMoveInstant(move);
+            } else {
+                applyMoveInstantly3D(move);
+            }
         }
     } else {
         // Rewind instantly
         while (state.currentMoveIndex > targetIndex) {
             const move = state.solutionMoves[state.currentMoveIndex];
             const inverseMove = getInverseMove(move);
-            applyMoveInstantly3D(inverseMove);
+            if (state.puzzleType === 'pyraminx') {
+                applyPyraminxMoveInstant(inverseMove);
+            } else {
+                applyMoveInstantly3D(inverseMove);
+            }
             state.currentMoveIndex--;
         }
     }

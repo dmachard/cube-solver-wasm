@@ -37,6 +37,21 @@
                 <h1 data-i18n="title">Rubik's Solver</h1>
             </div>
 
+            <div class="puzzle-selector">
+                <button id="btn-puzzle-cube" class="puzzle-btn active" data-puzzle="cube">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    </svg>
+                    <span data-i18n="puzzle-cube">Rubik's 3×3</span>
+                </button>
+                <button id="btn-puzzle-pyraminx" class="puzzle-btn" data-puzzle="pyraminx">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 22 20 2 20"></polygon>
+                    </svg>
+                    <span data-i18n="puzzle-pyraminx">Pyraminx</span>
+                </button>
+            </div>
+
             <nav class="nav-links">
                 <select id="theme-select" class="lang-select" aria-label="Select color scheme">
                     <option value="standard" data-i18n="scheme-standard">Standard Colors</option>
@@ -71,103 +86,156 @@
                         current state.</p>
                 </div>
 
-                <!-- View Mode Toggle Group -->
-                <div class="view-mode-container">
-                    <button id="btn-view-single" class="view-mode-btn active" data-view="single" data-i18n="view-single">Face par face</button>
-                    <button id="btn-view-unfolded" class="view-mode-btn" data-view="unfolded" data-i18n="view-unfolded">Patron déplié</button>
-                </div>
+                <!-- ============ CUBE MODE ============ -->
+                <div id="cube-mode">
+                    <!-- View Mode Toggle Group -->
+                    <div class="view-mode-container">
+                        <button id="btn-view-single" class="view-mode-btn active" data-view="single" data-i18n="view-single">Face par face</button>
+                        <button id="btn-view-unfolded" class="view-mode-btn" data-view="unfolded" data-i18n="view-unfolded">Patron déplié</button>
+                    </div>
 
-                <!-- Face Selector (Mobile & Desktop) -->
-                <div class="face-selector-container" id="face-selector-group">
-                    <label data-i18n="select-face">Sélectionner la face à éditer :</label>
-                    <div class="face-tabs" id="face-tabs">
-                        <button class="face-tab active" data-face="u" data-i18n="face-u" data-i18n-title="face-u-desc"
-                            title="Haut (Blanc)">Haut</button>
-                        <button class="face-tab" data-face="l" data-i18n="face-l" data-i18n-title="face-l-desc"
-                            title="Gauche (Orange)">Gauche</button>
-                        <button class="face-tab" data-face="f" data-i18n="face-f" data-i18n-title="face-f-desc"
-                            title="Devant (Vert)">Devant</button>
-                        <button class="face-tab" data-face="r" data-i18n="face-r" data-i18n-title="face-r-desc"
-                            title="Droite (Rouge)">Droite</button>
-                        <button class="face-tab" data-face="b" data-i18n="face-b" data-i18n-title="face-b-desc"
-                            title="Arrière (Bleu)">Arrière</button>
-                        <button class="face-tab" data-face="d" data-i18n="face-d" data-i18n-title="face-d-desc"
-                            title="Bas (Jaune)">Bas</button>
+                    <!-- Face Selector (Mobile & Desktop) -->
+                    <div class="face-selector-container" id="face-selector-group">
+                        <label data-i18n="select-face">Sélectionner la face à éditer :</label>
+                        <div class="face-tabs" id="face-tabs">
+                            <button class="face-tab active" data-face="u" data-i18n="face-u" data-i18n-title="face-u-desc"
+                                title="Haut (Blanc)">Haut</button>
+                            <button class="face-tab" data-face="l" data-i18n="face-l" data-i18n-title="face-l-desc"
+                                title="Gauche (Orange)">Gauche</button>
+                            <button class="face-tab" data-face="f" data-i18n="face-f" data-i18n-title="face-f-desc"
+                                title="Devant (Vert)">Devant</button>
+                            <button class="face-tab" data-face="r" data-i18n="face-r" data-i18n-title="face-r-desc"
+                                title="Droite (Rouge)">Droite</button>
+                            <button class="face-tab" data-face="b" data-i18n="face-b" data-i18n-title="face-b-desc"
+                                title="Arrière (Bleu)">Arrière</button>
+                            <button class="face-tab" data-face="d" data-i18n="face-d" data-i18n-title="face-d-desc"
+                                title="Bas (Jaune)">Bas</button>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Color Palette -->
+                    <div class="palette-container">
+                        <label data-i18n="select-color">Sélectionner la couleur :</label>
+                        <div class="palette">
+                            <button class="color-btn active" data-color="U" style="background-color: var(--color-u);"
+                                data-i18n-title="color-u-desc" title="White (Up / U)"></button>
+                            <button class="color-btn" data-color="L" style="background-color: var(--color-l);"
+                                data-i18n-title="color-l-desc" title="Orange (Left / L)"></button>
+                            <button class="color-btn" data-color="F" style="background-color: var(--color-f);"
+                                data-i18n-title="color-f-desc" title="Green (Front / F)"></button>
+                            <button class="color-btn" data-color="R" style="background-color: var(--color-r);"
+                                data-i18n-title="color-r-desc" title="Red (Right / R)"></button>
+                            <button class="color-btn" data-color="B" style="background-color: var(--color-b);"
+                                data-i18n-title="color-b-desc" title="Blue (Back / B)"></button>
+                            <button class="color-btn" data-color="D" style="background-color: var(--color-d);"
+                                data-i18n-title="color-d-desc" title="Yellow (Down / D)"></button>
+                        </div>
+                    </div>
+
+                    <!-- Custom Scheme Color Pickers -->
+                    <div id="custom-theme-config" class="theme-config-panel hidden">
+                        <div class="config-title-row">
+                            <h4 data-i18n="custom-colors-title">Personnaliser les couleurs :</h4>
+                        </div>
+                        <div class="config-grid">
+                            <div class="config-item">
+                                <span class="color-dot" style="background-color: var(--color-u);"></span>
+                                <span data-i18n="face-u">Haut</span>
+                                <input type="color" id="picker-u" value="#ff6baf">
+                            </div>
+                            <div class="config-item">
+                                <span class="color-dot" style="background-color: var(--color-l);"></span>
+                                <span data-i18n="face-l">Gauche</span>
+                                <input type="color" id="picker-l" value="#f97316">
+                            </div>
+                            <div class="config-item">
+                                <span class="color-dot" style="background-color: var(--color-f);"></span>
+                                <span data-i18n="face-f">Devant</span>
+                                <input type="color" id="picker-f" value="#10b981">
+                            </div>
+                            <div class="config-item">
+                                <span class="color-dot" style="background-color: var(--color-r);"></span>
+                                <span data-i18n="face-r">Droite</span>
+                                <input type="color" id="picker-r" value="#8b5cf6">
+                            </div>
+                            <div class="config-item">
+                                <span class="color-dot" style="background-color: var(--color-b);"></span>
+                                <span data-i18n="face-b">Arrière</span>
+                                <input type="color" id="picker-b" value="#2563eb">
+                            </div>
+                            <div class="config-item">
+                                <span class="color-dot" style="background-color: var(--color-d);"></span>
+                                <span data-i18n="face-d">Bas</span>
+                                <input type="color" id="picker-d" value="#ffea00">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2D Single Face / Net Layout -->
+                    <div class="net-wrapper">
+                        <div class="cube-net single-face-mode" id="cube-net">
+                            <!-- 6 faces -->
+                            <div class="face face-u active-face"></div>
+                            <div class="face face-l"></div>
+                            <div class="face face-f"></div>
+                            <div class="face face-r"></div>
+                            <div class="face face-b"></div>
+                            <div class="face face-d"></div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Interactive Color Palette -->
-                <div class="palette-container">
-                    <label data-i18n="select-color">Sélectionner la couleur :</label>
-                    <div class="palette">
-                        <button class="color-btn active" data-color="U" style="background-color: var(--color-u);"
-                            data-i18n-title="color-u-desc" title="White (Up / U)"></button>
-                        <button class="color-btn" data-color="L" style="background-color: var(--color-l);"
-                            data-i18n-title="color-l-desc" title="Orange (Left / L)"></button>
-                        <button class="color-btn" data-color="F" style="background-color: var(--color-f);"
-                            data-i18n-title="color-f-desc" title="Green (Front / F)"></button>
-                        <button class="color-btn" data-color="R" style="background-color: var(--color-r);"
-                            data-i18n-title="color-r-desc" title="Red (Right / R)"></button>
-                        <button class="color-btn" data-color="B" style="background-color: var(--color-b);"
-                            data-i18n-title="color-b-desc" title="Blue (Back / B)"></button>
-                        <button class="color-btn" data-color="D" style="background-color: var(--color-d);"
-                            data-i18n-title="color-d-desc" title="Yellow (Down / D)"></button>
+                <!-- ============ PYRAMINX MODE ============ -->
+                <div id="pyraminx-mode" class="hidden">
+                    <!-- View Mode Toggle Group for Pyraminx -->
+                    <div class="view-mode-container">
+                        <button id="btn-pyraminx-view-single" class="view-mode-btn active" data-view="single" data-i18n="view-single">Face par face</button>
+                        <button id="btn-pyraminx-view-unfolded" class="view-mode-btn" data-view="unfolded" data-i18n="view-unfolded">Patron déplié</button>
                     </div>
-                </div>
 
-                <!-- Custom Scheme Color Pickers -->
-                <div id="custom-theme-config" class="theme-config-panel hidden">
-                    <div class="config-title-row">
-                        <h4 data-i18n="custom-colors-title">Personnaliser les couleurs :</h4>
+                    <!-- Legend / Guide for Pyraminx faces -->
+                    <div class="pyraminx-legend-box" id="pyraminx-legend-box" style="margin-bottom: 16px; font-size: 0.85rem; padding: 12px; border-radius: 8px; background-color: var(--accent-light); border: 1px solid var(--border-standard); color: var(--text-secondary); line-height: 1.4;">
+                        <strong data-i18n="pyraminx-legend-title">💡 Guide d'identification des faces :</strong>
+                        <p data-i18n="pyraminx-legend-desc" style="margin: 4px 0 8px 0; font-size: 0.78rem; opacity: 0.85;">Chaque face du solveur est nommée d'après le sommet qui lui est opposé (tourner un sommet modifie les 3 autres faces mais pas celle qui lui fait face).</p>
+                        <ul style="margin: 6px 0 0 18px; padding: 0; display: flex; flex-direction: column; gap: 4px;">
+                            <li data-i18n="pyraminx-legend-u">U : Face Jaune (Haut)</li>
+                            <li data-i18n="pyraminx-legend-l">L : Face Bleue (Gauche)</li>
+                            <li data-i18n="pyraminx-legend-r">R : Face Rouge (Droite)</li>
+                            <li data-i18n="pyraminx-legend-b">B : Face Verte (Arrière)</li>
+                        </ul>
                     </div>
-                    <div class="config-grid">
-                        <div class="config-item">
-                            <span class="color-dot" style="background-color: var(--color-u);"></span>
-                            <span data-i18n="face-u">Haut</span>
-                            <input type="color" id="picker-u" value="#ff6baf">
+
+                    <!-- Face Selector for Pyraminx -->
+                    <div class="face-selector-container" id="pyraminx-face-selector-group">
+                        <label data-i18n="select-face">Select face to edit:</label>
+                        <div class="face-tabs">
+                            <button class="pyraminx-face-tab face-tab active" data-face="u">U</button>
+                            <button class="pyraminx-face-tab face-tab" data-face="l">L</button>
+                            <button class="pyraminx-face-tab face-tab" data-face="r">R</button>
+                            <button class="pyraminx-face-tab face-tab" data-face="b">B</button>
                         </div>
-                        <div class="config-item">
-                            <span class="color-dot" style="background-color: var(--color-l);"></span>
-                            <span data-i18n="face-l">Gauche</span>
-                            <input type="color" id="picker-l" value="#f97316">
+                    </div>
+
+                    <!-- Pyraminx Color Palette (4 colors) -->
+                    <div class="palette-container" id="pyraminx-palette">
+                        <label data-i18n="select-color">Select color:</label>
+                        <div class="palette">
+                            <button class="color-btn active" data-color="U" style="background-color: var(--color-b);" title="Blue"></button>
+                            <button class="color-btn" data-color="L" style="background-color: var(--color-d);" title="Yellow"></button>
+                            <button class="color-btn" data-color="R" style="background-color: var(--color-r);" title="Red"></button>
+                            <button class="color-btn" data-color="B" style="background-color: var(--color-f);" title="Green"></button>
                         </div>
-                        <div class="config-item">
-                            <span class="color-dot" style="background-color: var(--color-f);"></span>
-                            <span data-i18n="face-f">Devant</span>
-                            <input type="color" id="picker-f" value="#10b981">
-                        </div>
-                        <div class="config-item">
-                            <span class="color-dot" style="background-color: var(--color-r);"></span>
-                            <span data-i18n="face-r">Droite</span>
-                            <input type="color" id="picker-r" value="#8b5cf6">
-                        </div>
-                        <div class="config-item">
-                            <span class="color-dot" style="background-color: var(--color-b);"></span>
-                            <span data-i18n="face-b">Arrière</span>
-                            <input type="color" id="picker-b" value="#2563eb">
-                        </div>
-                        <div class="config-item">
-                            <span class="color-dot" style="background-color: var(--color-d);"></span>
-                            <span data-i18n="face-d">Bas</span>
-                            <input type="color" id="picker-d" value="#ffea00">
+                    </div>
+
+                    <!-- Pyraminx 2D Net (SVG triangles, populated by JS) -->
+                    <div class="net-wrapper">
+                        <div class="pyraminx-net" id="pyraminx-net">
+                            <!-- Populated dynamically by pyraminx-editor.js -->
                         </div>
                     </div>
                 </div>
 
-                <!-- 2D Single Face / Net Layout -->
-                <div class="net-wrapper">
-                    <div class="cube-net single-face-mode" id="cube-net">
-                        <!-- 6 faces -->
-                        <div class="face face-u active-face"></div>
-                        <div class="face face-l"></div>
-                        <div class="face face-f"></div>
-                        <div class="face face-r"></div>
-                        <div class="face face-b"></div>
-                        <div class="face face-d"></div>
-                    </div>
-                </div>
-
-                <!-- Editor Action Buttons -->
+                <!-- Editor Action Buttons (shared) -->
                 <div class="editor-actions">
                     <button id="btn-reset" class="btn-secondary" data-i18n="reset-solved">🗑️ Reset to Solved</button>
                     <button id="btn-random" class="btn-secondary" data-i18n="random-scramble">🎲 Random
@@ -194,8 +262,22 @@
                         solving moves.</p>
                 </div>
 
-                <!-- Three.js Canvas Container -->
+                <!-- Three.js Canvas Container (Cube) -->
                 <div class="canvas-container" id="canvas-container">
+                    <div class="visualizer-overlay-controls">
+                        <button class="view-control-btn" id="btn-cube-rotate-left" title="Tourner à gauche">◀</button>
+                        <button class="view-control-btn" id="btn-cube-reset-view" title="Vue par défaut">🏠</button>
+                        <button class="view-control-btn" id="btn-cube-rotate-right" title="Tourner à droite">▶</button>
+                    </div>
+                </div>
+
+                <!-- Three.js Canvas Container (Pyraminx) -->
+                <div class="canvas-container hidden" id="pyraminx-canvas-container">
+                    <div class="visualizer-overlay-controls">
+                        <button class="view-control-btn" id="btn-pyra-rotate-left" title="Tourner à gauche">◀</button>
+                        <button class="view-control-btn" id="btn-pyra-reset-view" title="Vue par défaut">🏠</button>
+                        <button class="view-control-btn" id="btn-pyra-rotate-right" title="Tourner à droite">▶</button>
+                    </div>
                 </div>
 
                 <!-- Interactive Media Player for the solution moves (Horizontal Underneath) -->

@@ -159,6 +159,68 @@ body {
     }
 }
 
+/* Puzzle Type Selector (Segmented Control in Navbar) */
+.puzzle-selector {
+    display: flex;
+    background-color: var(--accent-light);
+    border: 1px solid var(--border-standard);
+    border-radius: 10px;
+    padding: 3px;
+    gap: 3px;
+}
+
+.puzzle-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    padding: 7px 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 7px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+}
+
+.puzzle-btn:hover {
+    color: var(--text-primary);
+}
+
+.puzzle-btn.active {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.puzzle-btn svg {
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .puzzle-selector {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+    }
+    .puzzle-btn span {
+        display: inline;
+    }
+}
+
+@media (max-width: 576px) {
+    .puzzle-btn {
+        padding: 6px 10px;
+        font-size: 0.78rem;
+    }
+}
+
 .subtitle {
     font-size: 1rem;
     color: var(--text-secondary);
@@ -448,6 +510,53 @@ body {
     flex-shrink: 0;
 }
 
+/* Pyraminx 2D Net Styles */
+.pyraminx-net {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 20px 0;
+}
+
+.pyraminx-net.unfolded-mode {
+    display: grid;
+    grid-template-columns: repeat(2, 170px);
+    grid-template-rows: repeat(2, 147px);
+    gap: 12px;
+    justify-content: center;
+}
+
+.pyraminx-net.unfolded-mode .pyraminx-face-svg {
+    display: block !important;
+    width: 170px;
+    height: 147px;
+}
+
+.pyraminx-face-svg {
+    display: none;
+    width: 220px;
+    height: 191px;
+    overflow: visible;
+}
+
+.pyraminx-face-svg.active-face {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@media (max-width: 576px) {
+    .pyraminx-net.unfolded-mode {
+        grid-template-columns: repeat(2, 120px);
+        grid-template-rows: repeat(2, 104px);
+        gap: 8px;
+    }
+    .pyraminx-net.unfolded-mode .pyraminx-face-svg {
+        width: 120px;
+        height: 104px;
+    }
+}
+
 .face {
     display: none; /* hidden by default in single face mode */
     grid-template-columns: repeat(3, 1fr);
@@ -721,6 +830,47 @@ body {
 
 .canvas-container:active {
     cursor: grabbing;
+}
+
+.visualizer-overlay-controls {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    background: rgba(30, 41, 59, 0.75);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 6px;
+    border-radius: 30px;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.view-control-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.view-control-btn:hover {
+    background: var(--accent-color);
+    color: #0f172a;
+    transform: scale(1.1);
+}
+
+.view-control-btn:active {
+    transform: scale(0.95);
 }
 
 @media (max-width: 480px) {
