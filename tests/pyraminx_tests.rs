@@ -1,5 +1,5 @@
-use cube_solver_wasm::solve_pyraminx;
 use cube_solver_wasm::pyraminx::{apply_move, Move};
+use cube_solver_wasm::solve_pyraminx;
 
 #[test]
 fn test_solved_pyraminx() {
@@ -71,7 +71,7 @@ fn apply_move_str(state: &[u8; 36], mv: &str) -> [u8; 36] {
             next = apply_move_str(&next, "b");
             next
         }
-        _ => next
+        _ => next,
     }
 }
 
@@ -113,5 +113,9 @@ fn test_pyraminx_moves_and_scrambles() {
     for mv in solution.split_whitespace() {
         check_state = apply_move_str(&check_state, mv);
     }
-    assert_eq!(&check_state, solved, "Solution '{}' failed to solve scramble '{}'", solution, scrambled_str);
+    assert_eq!(
+        &check_state, solved,
+        "Solution '{}' failed to solve scramble '{}'",
+        solution, scrambled_str
+    );
 }

@@ -52,4 +52,3 @@ pub fn solve_pyraminx(cube_string: &str) -> String {
 pub fn version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
 }
-

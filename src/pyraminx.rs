@@ -4,17 +4,25 @@ static PYRAMINX_TABLE: OnceLock<Vec<u8>> = OnceLock::new();
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Move {
-    U, Up,
-    L, Lp,
-    R, Rp,
-    B, Bp,
+    U,
+    Up,
+    L,
+    Lp,
+    R,
+    Rp,
+    B,
+    Bp,
 }
 
 const MOVE_LIST: [Move; 8] = [
-    Move::U, Move::Up,
-    Move::L, Move::Lp,
-    Move::R, Move::Rp,
-    Move::B, Move::Bp,
+    Move::U,
+    Move::Up,
+    Move::L,
+    Move::Lp,
+    Move::R,
+    Move::Rp,
+    Move::B,
+    Move::Bp,
 ];
 
 /// Applies a clockwise or counter-clockwise corner rotation to the 36-facelet state
@@ -152,7 +160,7 @@ fn permutation_to_index(perm: &[u8; 6]) -> usize {
     let mut index = 0;
     for i in 0..6 {
         let mut count = 0;
-        for j in i+1..6 {
+        for j in i + 1..6 {
             if perm[j] < perm[i] {
                 count += 1;
             }
@@ -169,10 +177,30 @@ fn permutation_to_index(perm: &[u8; 6]) -> usize {
 /// Maps the 36-facelet state to a unique index in 0..3,732,480
 pub fn get_core_state_index(state: &[u8; 36]) -> Option<usize> {
     // 1. Corner orientations
-    let c0 = match state[11] { b'L' => Some(0), b'R' => Some(1), b'B' => Some(2), _ => None }?;
-    let c1 = match state[5]  { b'U' => Some(0), b'B' => Some(1), b'R' => Some(2), _ => None }?;
-    let c2 = match state[7]  { b'U' => Some(0), b'L' => Some(1), b'B' => Some(2), _ => None }?;
-    let c3 = match state[2]  { b'U' => Some(0), b'L' => Some(1), b'R' => Some(2), _ => None }?;
+    let c0 = match state[11] {
+        b'L' => Some(0),
+        b'R' => Some(1),
+        b'B' => Some(2),
+        _ => None,
+    }?;
+    let c1 = match state[5] {
+        b'U' => Some(0),
+        b'B' => Some(1),
+        b'R' => Some(2),
+        _ => None,
+    }?;
+    let c2 = match state[7] {
+        b'U' => Some(0),
+        b'L' => Some(1),
+        b'B' => Some(2),
+        _ => None,
+    }?;
+    let c3 = match state[2] {
+        b'U' => Some(0),
+        b'L' => Some(1),
+        b'R' => Some(2),
+        _ => None,
+    }?;
     let corner_idx = c0 + c1 * 3 + c2 * 9 + c3 * 27; // 0..81
 
     // 2. Edge permutation
@@ -186,10 +214,14 @@ pub fn get_core_state_index(state: &[u8; 36]) -> Option<usize> {
 
     let mut seen = 0u8;
     for &p in &edges_pos {
-        if p >= 6 { return None; }
+        if p >= 6 {
+            return None;
+        }
         seen |= 1 << p;
     }
-    if seen != 0b111111 { return None; }
+    if seen != 0b111111 {
+        return None;
+    }
 
     let edge_perm_idx = permutation_to_index(&edges_pos); // 0..720
 
