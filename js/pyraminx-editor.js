@@ -257,7 +257,11 @@ export function resetPyraminxToSolved() {
     state.cubeState = solved.split('');
     renderPyraminxNet();
     validatePyraminx();
-    if (window.updatePyraminx3DColors) window.updatePyraminx3DColors();
+    if (window.buildPyraminx3D) {
+        window.buildPyraminx3D();
+    } else if (window.updatePyraminx3DColors) {
+        window.updatePyraminx3DColors();
+    }
 }
 
 /**
@@ -385,7 +389,11 @@ export function applyPyraminxMoveToState(move) {
     state.cubeState = next;
     renderPyraminxNet();
     validatePyraminx();
-    if (window.updatePyraminx3DColors) window.updatePyraminx3DColors();
+    if (window.buildPyraminx3D) {
+        window.buildPyraminx3D();
+    } else if (window.updatePyraminx3DColors) {
+        window.updatePyraminx3DColors();
+    }
 }
 
 // Expose on window for other modules to call without circular imports
@@ -414,7 +422,11 @@ export function generateRandomPyraminxState(moves = 11) {
     state.cubeState = curr;
     renderPyraminxNet();
     validatePyraminx();
-    if (window.updatePyraminx3DColors) window.updatePyraminx3DColors();
+    if (window.buildPyraminx3D) {
+        window.buildPyraminx3D();
+    } else if (window.updatePyraminx3DColors) {
+        window.updatePyraminx3DColors();
+    }
 }
 
 // Pure simulation: return new state array after applying mv without mutating global state

@@ -7,6 +7,7 @@ import { state, PYRAMINX_FACE_MAPPINGS } from './constants.js';
 import { simulatePyraminxMove } from './pyraminx-editor.js';
 
 let pyraminxScene, pyraminxCamera, pyraminxRenderer, pyraminxControls;
+let pyraminxRoot;
 let pyraminxMeshes = [];
 let pyraminxFaceGroups = [];
 
@@ -41,6 +42,20 @@ const TETRA_FACES = [
     [0, 1, 3],  // Face R (right-facing)
     [1, 2, 3],  // Face B (bottom-facing)
 ];
+
+function alignPyraminxTipUp() {
+    if (!pyraminxRoot) return;
+    const target = new THREE.Vector3(0, 1, 0);
+    const from = TETRA_VERTICES[0].clone().normalize();
+    const axis = new THREE.Vector3().crossVectors(from, target);
+    const angle = Math.acos(Math.max(-1, Math.min(1, from.dot(target))));
+    if (axis.lengthSq() > 1e-6) {
+        axis.normalize();
+        pyraminxRoot.setRotationFromAxisAngle(axis, angle);
+    } else {
+        pyraminxRoot.rotation.set(0, 0, 0);
+    }
+}
 
 /**
  * Subdivides a triangle into 9 smaller triangles using barycentric coordinates
@@ -89,9 +104,9 @@ function subdivideTriangle(va, vb, vc) {
  * Build a single colored triangle mesh with slight inward shrink for gap effect
  */
 function buildTriangleMesh(v0, v1, v2, color) {
-    // Shrink triangle slightly toward its center for visual gap between facelets
+    // Keep triangles mostly flush with a tiny gap so the facelets remain visible.
     const center = new THREE.Vector3().addVectors(v0, v1).add(v2).divideScalar(3);
-    const shrink = 0.04;
+    const shrink = 0.018;
     const s0 = new THREE.Vector3().lerpVectors(v0, center, shrink);
     const s1 = new THREE.Vector3().lerpVectors(v1, center, shrink);
     const s2 = new THREE.Vector3().lerpVectors(v2, center, shrink);
@@ -109,7 +124,10 @@ function buildTriangleMesh(v0, v1, v2, color) {
         color: color,
         side: THREE.DoubleSide,
         flatShading: true,
-        shininess: 30
+        shininess: 30,
+        polygonOffset: true,
+        polygonOffsetFactor: 1,
+        polygonOffsetUnits: 1
     });
 
     return new THREE.Mesh(geometry, material);
@@ -128,7 +146,7 @@ export function initPyraminx3D() {
 
     // Camera
     pyraminxCamera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
-    pyraminxCamera.position.set(3, 2, 4);
+    pyraminxCamera.position.set(0, 3.5, 4.5);
     pyraminxCamera.lookAt(0, 0, 0);
 
     // Renderer
@@ -142,6 +160,11 @@ export function initPyraminx3D() {
     pyraminxControls.enableDamping = true;
     pyraminxControls.dampingFactor = 0.08;
     pyraminxControls.target.set(0, 0, 0);
+
+    // Root group for the Pyraminx meshes so we can orient the tip upward
+    pyraminxRoot = new THREE.Group();
+    pyraminxScene.add(pyraminxRoot);
+    alignPyraminxTipUp();
 
     // Lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -226,6 +249,7 @@ export function initPyraminx3D() {
 
     // Expose global update function for the 2D editor
     window.updatePyraminx3DColors = updatePyraminx3DColors;
+    window.buildPyraminx3D = buildPyraminx3D;
 }
 
 /**
@@ -234,32 +258,37 @@ export function initPyraminx3D() {
 export function buildPyraminx3D() {
     if (!pyraminxScene) return;
 
-    // Remove old meshes
-    pyraminxMeshes.forEach(m => pyraminxScene.remove(m));
+    // Remove existing root and meshes
+    if (pyraminxRoot) {
+        pyraminxScene.remove(pyraminxRoot);
+        pyraminxRoot = null;
+    }
+    pyraminxMeshes.forEach(m => {
+        if (m.parent) m.parent.remove(m);
+    });
     pyraminxMeshes = [];
 
-    // Dark internal structure (slightly smaller solid tetrahedron)
+    pyraminxRoot = new THREE.Group();
+    alignPyraminxTipUp();
+    pyraminxScene.add(pyraminxRoot);
+
+    // Dark internal structure (solid tetrahedron) to support the sticker faces
     const innerGeo = new THREE.TetrahedronGeometry(K * 1.65, 0);
     const innerMat = new THREE.MeshPhongMaterial({ color: 0x1e293b, flatShading: true });
     const innerMesh = new THREE.Mesh(innerGeo, innerMat);
-    pyraminxScene.add(innerMesh);
+    pyraminxRoot.add(innerMesh);
     pyraminxMeshes.push(innerMesh);
 
     // Build each face's 9 colored triangles
     pyraminxFaceGroups = [];
     TETRA_FACES.forEach((faceVerts, faceIdx) => {
-        // Create a group pivot for this face to allow rotations around its center
-        const faceGroup = new THREE.Group();
-        pyraminxScene.add(faceGroup);
-        pyraminxFaceGroups.push(faceGroup);
-
         const va = TETRA_VERTICES[faceVerts[0]];
         const vb = TETRA_VERTICES[faceVerts[1]];
         const vc = TETRA_VERTICES[faceVerts[2]];
 
         // Push face outward slightly so it sits above the inner structure
         const faceCenter = new THREE.Vector3().addVectors(va, vb).add(vc).divideScalar(3);
-        const normal = faceCenter.clone().normalize().multiplyScalar(0.03);
+        const normal = faceCenter.clone().normalize().multiplyScalar(0.01);
 
         const subTriangles = subdivideTriangle(va, vb, vc);
 
@@ -275,10 +304,12 @@ export function buildPyraminx3D() {
                 color
             );
             mesh.userData = { faceIdx, triIdx, index };
-            
-            // Attach mesh to the face group so rotations pivot around face center
-            pyraminxScene.add(mesh); // add to scene first
-            pyraminxFaceGroups[faceIdx].attach(mesh);
+
+            if (pyraminxRoot) {
+                pyraminxRoot.add(mesh);
+            } else {
+                pyraminxScene.add(mesh);
+            }
             pyraminxMeshes.push(mesh);
         });
     });
@@ -343,38 +374,70 @@ export function animatePyraminxMove(move, duration = 500) {
             return mesh.userData && affectedIndices.includes(mesh.userData.index);
         });
 
-        // Assemble the temporary pivot group at the origin (0, 0, 0)
+        // Assemble the temporary pivot group around the rotation vertex
         const pivot = new THREE.Group();
+        const pivotPoint = vertex.clone();
+        const worldAxis = axis.clone();
+        if (pyraminxRoot) {
+            const rootQuat = new THREE.Quaternion();
+            const rootPos = new THREE.Vector3();
+            pyraminxRoot.getWorldQuaternion(rootQuat);
+            pyraminxRoot.getWorldPosition(rootPos);
+            worldAxis.applyQuaternion(rootQuat).normalize();
+            pivotPoint.applyQuaternion(rootQuat).add(rootPos);
+        }
+        pivot.position.copy(pivotPoint);
+        pivot.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), worldAxis);
         pyraminxScene.add(pivot);
 
-        // Attach meshes to the pivot, saving their original local position/rotation/scale relative to face group
+        // Attach meshes to the pivot so they rotate together as a single slice
         sliceMeshes.forEach(mesh => {
-            mesh._homePosition = mesh.position.clone();
-            mesh._homeQuaternion = mesh.quaternion.clone();
-            mesh._homeScale = mesh.scale.clone();
             pivot.attach(mesh);
         });
 
-        // Trigger GSAP tween animation
-        const anim = { angle: 0 };
+        // Trigger GSAP quaternion tween animation for arbitrary axis rotation
+        const startQuat = pivot.quaternion.clone();
+        const endQuat = pivot.quaternion.clone().multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle));
+        const anim = { t: 0 };
         gsap.to(anim, {
             duration: duration / 1000,
-            angle: angle,
+            t: 1,
             ease: "power2.out",
             onUpdate: () => {
-                pivot.quaternion.setFromAxisAngle(axis, anim.angle);
+                THREE.Quaternion.slerp(startQuat, endQuat, pivot.quaternion, anim.t);
             },
             onComplete: () => {
-                // Snapping: re-attach meshes back to their original face groups and restore local coords
+                // Re-attach meshes back to the Pyraminx root group so orientation stays consistent
                 sliceMeshes.forEach(mesh => {
-                    const faceIdx = mesh.userData.faceIdx;
-                    pyraminxFaceGroups[faceIdx].add(mesh);
-                    mesh.position.copy(mesh._homePosition);
-                    mesh.quaternion.copy(mesh._homeQuaternion);
-                    mesh.scale.copy(mesh._homeScale);
+                    if (pyraminxRoot) {
+                        pyraminxRoot.attach(mesh);
+                    } else {
+                        pyraminxScene.attach(mesh);
+                    }
+
+                    // Snap rotation and position to eliminate floating-point drift
+                    mesh.position.x = Math.round(mesh.position.x * 1000) / 1000;
+                    mesh.position.y = Math.round(mesh.position.y * 1000) / 1000;
+                    mesh.position.z = Math.round(mesh.position.z * 1000) / 1000;
+                    mesh.updateMatrix();
+
+                    const matrix = mesh.matrix.clone();
+                    const elements = matrix.elements;
+                    const xCol = new THREE.Vector3(elements[0], elements[1], elements[2]).normalize();
+                    const yCol = new THREE.Vector3(elements[4], elements[5], elements[6]).normalize();
+                    xCol.set(Math.round(xCol.x), Math.round(xCol.y), Math.round(xCol.z));
+                    yCol.set(Math.round(yCol.x), Math.round(yCol.y), Math.round(yCol.z));
+                    const zCol = new THREE.Vector3().crossVectors(xCol, yCol).normalize();
+
+                    elements[0] = xCol.x; elements[1] = xCol.y; elements[2] = xCol.z;
+                    elements[4] = yCol.x; elements[5] = yCol.y; elements[6] = yCol.z;
+                    elements[8] = zCol.x; elements[9] = zCol.y; elements[10] = zCol.z;
+
+                    mesh.matrix.copy(matrix);
+                    mesh.matrix.decompose(mesh.position, mesh.quaternion, mesh.scale);
                 });
 
-                pyraminxScene.remove(pivot);
+                if (pivot.parent) pivot.parent.remove(pivot);
 
                 // Update logical state and colors
                 if (window.applyPyraminxMoveToState) window.applyPyraminxMoveToState(move);
