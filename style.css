@@ -364,10 +364,19 @@ body {
     border-radius: 4px;
 }
 
-/* Editor Secondary Actions */
-.editor-actions {
+.main-actions {
     display: flex;
     gap: 12px;
+    width: 100%;
+}
+
+.main-actions > button {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 48px; /* Force equal height */
+    padding: 0 10px;
 }
 
 .btn-secondary {
@@ -375,7 +384,6 @@ body {
     background: var(--bg-surface);
     border: 1px solid var(--border-standard);
     color: var(--text-primary);
-    padding: 10px 14px;
     font-size: 0.85rem;
     font-weight: 500;
     border-radius: 8px;
@@ -425,7 +433,6 @@ body {
     color: white;
     border: none;
     border-radius: 8px;
-    padding: 14px;
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
@@ -472,7 +479,7 @@ body {
     width: 100%;
     flex: 1 1 auto;
     /* Grow and shrink dynamically inside the visualizer panel */
-    min-height: 400px;
+    min-height: 550px;
     border-radius: 12px;
     background: #0f172a;
     /* Clean slate-900 background for 3D model contrast */

@@ -118,36 +118,6 @@ async function jumpToStep(targetIndex) {
     }
 }
 
-/**
- * Toggles solution autoplay playback
- */
-/**
- * Jumps to a specific step in the timeline instantly (without animation)
- * Used during range scrubbing for responsive, real-time feedback
- * @param {number} targetIndex The target step index to reach
- */
-export function jumpToStepInstant(targetIndex) {
-    if (targetIndex === state.currentMoveIndex) return;
-
-    if (targetIndex > state.currentMoveIndex) {
-        // Fast forward instantly
-        while (state.currentMoveIndex < targetIndex) {
-            state.currentMoveIndex++;
-            const move = state.solutionMoves[state.currentMoveIndex];
-            applyMoveInstantly3D(move);
-        }
-    } else {
-        // Rewind instantly
-        while (state.currentMoveIndex > targetIndex) {
-            const move = state.solutionMoves[state.currentMoveIndex];
-            const inverseMove = getInverseMove(move);
-            applyMoveInstantly3D(inverseMove);
-            state.currentMoveIndex--;
-        }
-    }
-
-    updateTimelineHighlights();
-}
 
 /**
  * Highlights the current active move node and scrolls it into central timeline view

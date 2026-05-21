@@ -1,5 +1,5 @@
-import { FACE_ORDER, FACELET_OFFSET, state } from './constants.js';
-import { build3DCube, update3DCubeColors, extract2DStateFrom3D } from './visualizer.js';
+import { FACE_ORDER, state } from './constants.js';
+import { build3DCube, extract2DStateFrom3D } from './visualizer.js';
 import { applyMoveInstantly3D } from './rotations.js';
 import { showSolution } from './player.js';
 import { t } from './i18n.js';

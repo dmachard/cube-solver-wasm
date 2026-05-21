@@ -60,19 +60,15 @@
             </nav>
         </header>
 
-        <!-- Main Workspace (Responsive Dual-Panel Grid) -->
+        <!-- Main Workspace (Responsive Single Column) -->
         <main class="workspace">
 
             <!-- SINGLE PANEL: 3D Render, Palette & Interactive Player -->
             <section class="panel visualizer-panel">
-                <div class="panel-header">
-                    <h2 data-i18n="3d-visualizer">3D Visualizer</h2>
-                    <p class="panel-desc" data-i18n="2d-desc">Select a color below and paint directly on the 3D cube to match your physical cube's state.</p>
-                </div>
-
                 <!-- Interactive Color Palette -->
                 <div class="palette-container">
-                    <label data-i18n="select-color">Sélectionner la couleur :</label>
+                    <label data-i18n="select-color"></label>
+                    <p class="panel-desc" data-i18n="2d-desc"></p>
                     <div class="palette">
                         <button class="color-btn active" data-color="U" style="background-color: var(--color-u);"
                             data-i18n-title="color-u-desc" title="White (Up / U)"></button>
@@ -128,11 +124,7 @@
                     </div>
                 </div>
 
-                <!-- Editor Action Buttons -->
-                <div class="editor-actions">
-                    <button id="btn-reset" class="btn-secondary" data-i18n="reset-solved">🗑️ Reset to Solved</button>
-                    <button id="btn-random" class="btn-secondary" data-i18n="random-scramble">🎲 Random Scramble</button>
-                </div>
+
 
                 <!-- Three.js Canvas Container -->
                 <div class="canvas-container" id="canvas-container">
@@ -153,11 +145,15 @@
                     <span id="validation-message" data-i18n="wasm-loading">Loading Rust/WASM Engine...</span>
                 </div>
 
-                <!-- Main Action Button -->
-                <button id="btn-solve" class="btn-primary" disabled data-i18n="solve-cube">
-                    <span class="btn-text">Solve Cube</span>
-                    <div class="loader hidden"></div>
-                </button>
+                <!-- Main Action Buttons -->
+                <div class="main-actions">
+                    <button id="btn-reset" class="btn-secondary" data-i18n="reset-solved">🗑️ Reset</button>
+                    <button id="btn-random" class="btn-secondary" data-i18n="random-scramble">🎲 Scramble</button>
+                    <button id="btn-solve" class="btn-primary" disabled data-i18n="solve-cube">
+                        <span class="btn-text">Solve Cube</span>
+                        <div class="loader hidden"></div>
+                    </button>
+                </div>
             </section>
 
         </main>

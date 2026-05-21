@@ -4,14 +4,7 @@
 
 export const FACE_ORDER = ['U', 'L', 'F', 'R', 'B', 'D'];
 
-export const FACELET_OFFSET = {
-    'U': 0,
-    'R': 9,
-    'F': 18,
-    'D': 27,
-    'L': 36,
-    'B': 45
-};
+
 
 // High-contrast Rubik's colors mapping
 export const COLOR_HEX_MAP = {
