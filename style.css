@@ -179,29 +179,6 @@ body {
     .app-container {
         padding: 30px 15px;
     }
-
-    .workspace {
-        display: flex;
-        flex-direction: row;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        scroll-behavior: smooth;
-        gap: 20px;
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
-    }
-
-    .workspace::-webkit-scrollbar {
-        display: none; /* Chrome, Safari and Opera */
-    }
-
-    .panel {
-        flex: 0 0 100%;
-        min-width: 100%;
-        scroll-snap-align: start;
-        height: auto !important;
-        /* Allow panels to adapt to content size on mobile */
-    }
 }
 
 /* ==========================================================================
@@ -229,12 +206,7 @@ body {
     justify-content: flex-start;
 }
 
-.panel-header h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 4px;
-}
+
 
 .panel-desc {
     font-size: 0.88rem;
@@ -493,16 +465,7 @@ body {
     cursor: grabbing;
 }
 
-@media (max-width: 480px) {
-    .visualizer-panel {
-        height: auto;
-        /* Keep visualizer card compact on small devices */
-    }
-}
 
-/* ==========================================================================
-   6. Premium Horizontal Stepped Timeline
-   ========================================================================== */
 .player-panel {
     display: flex;
     flex-direction: column;

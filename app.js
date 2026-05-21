@@ -4,7 +4,7 @@ import init, { solve, version } from './pkg/cube_solver_wasm.js';
 // 2. Import our clean modular specialized scripts
 import { state } from './js/constants.js';
 import { init3DVisualizer } from './js/visualizer.js';
-import { init2DNet, validateCube } from './js/editor.js';
+import { initEditorControls, validateCube } from './js/editor.js';
 import { initPlayerControls, showSolution } from './js/player.js';
 import { initLanguage, setLanguage, t } from './js/i18n.js';
 import { initThemeScheme, setThemeScheme } from './js/theme.js';
@@ -38,7 +38,7 @@ async function startApplication() {
 
         // 1. Initialize our modular components in order
         init3DVisualizer();
-        init2DNet();
+        initEditorControls();
         initPlayerControls();
 
         // Initialize timeline to Étape 0 immediately on startup so it is always visible!

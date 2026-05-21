@@ -5,9 +5,9 @@ import { showSolution } from './player.js';
 import { t } from './i18n.js';
 
 /**
- * Initializes the 2D Net Editor, color palette and action buttons
+ * Initializes the color palette and action buttons
  */
-export function init2DNet() {
+export function initEditorControls() {
     // 1. Setup Color Palette Click Events
     const paletteButtons = document.querySelectorAll(".color-btn");
     paletteButtons.forEach(btn => {
