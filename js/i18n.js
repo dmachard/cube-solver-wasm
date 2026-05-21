@@ -2,8 +2,8 @@ export const translations = {
     en: {
         title: "Rubik's Solver",
         "title-desc": "3D Rubik's Cube Solver",
-        "2d-config": "2D Configuration",
-        "2d-desc": "Paint the squares below to match your physical cube's current state.",
+        "2d-config": "Cube Configuration",
+        "2d-desc": "Select a color below and paint directly on the 3D cube to match your physical cube's state.",
         "select-face": "Select face to edit:",
         "select-color": "Select color:",
         "reset-solved": "🗑️ Reset to Solved",
@@ -64,8 +64,8 @@ export const translations = {
     fr: {
         title: "Solveur Rubik's",
         "title-desc": "Solveur de Rubik's Cube 3D",
-        "2d-config": "Configuration 2D",
-        "2d-desc": "Coloriez les carrés ci-dessous pour correspondre à l'état de votre cube physique.",
+        "2d-config": "Configuration du Cube",
+        "2d-desc": "Sélectionnez une couleur ci-dessous et peignez directement sur le cube 3D pour reproduire l'état de votre cube physique.",
         "select-face": "Sélectionner la face à éditer :",
         "select-color": "Sélectionner la couleur :",
         "reset-solved": "🗑️ Réinitialiser",

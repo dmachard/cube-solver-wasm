@@ -1,4 +1,5 @@
 import { COLOR_HEX_MAP, state } from './constants.js';
+import { validateCube } from './editor.js';
 
 // Internal Three.js Globals
 export let scene, camera, renderer, controls;
@@ -19,7 +20,7 @@ export function init3DVisualizer() {
 
     // 2. Setup Perspective Camera
     camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
-    camera.position.set(5, 5, 8); // Elegant default camera angle looking down
+    camera.position.set(4, 4, 6); // Closer camera angle to make the cube look bigger
 
     // 3. Setup WebGL Renderer with high antialiasing
     renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -31,7 +32,7 @@ export function init3DVisualizer() {
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true; // Damping adds smooth weight to camera rotations
     controls.dampingFactor = 0.05;
-    controls.minDistance = 4;
+    controls.minDistance = 3;
     controls.maxDistance = 15;
 
     // 5. Setup Ambient & Directional Lights
@@ -55,6 +56,9 @@ export function init3DVisualizer() {
     // Handle responsive scaling dynamically using ResizeObserver on the container itself
     const resizeObserver = new ResizeObserver(() => onWindowResize());
     resizeObserver.observe(container);
+
+    // Setup raycaster for 3D painting
+    setupRaycaster();
 }
 
 /**
@@ -70,6 +74,51 @@ function onWindowResize() {
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height);
+}
+
+function setupRaycaster() {
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let pointerDownTime = 0;
+    let pointerDownPos = { x: 0, y: 0 };
+
+    renderer.domElement.addEventListener('pointerdown', (e) => {
+        pointerDownTime = Date.now();
+        pointerDownPos = { x: e.clientX, y: e.clientY };
+    });
+
+    renderer.domElement.addEventListener('pointerup', (e) => {
+        const timeDiff = Date.now() - pointerDownTime;
+        const dist = Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y);
+        
+        // Treat as click if quick and little movement
+        if (timeDiff < 300 && dist < 10) {
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(cubies);
+
+            if (intersects.length > 0) {
+                const intersection = intersects[0];
+                const cubie = intersection.object;
+                const materialIndex = Math.floor(intersection.faceIndex / 2);
+
+                // Prevent painting center pieces (fixed)
+                const cx = cubie.userData.origX;
+                const cy = cubie.userData.origY;
+                const cz = cubie.userData.origZ;
+                const isCenter = (Math.abs(cx) + Math.abs(cy) + Math.abs(cz)) === 1;
+
+                if (!isCenter) {
+                    cubie.material[materialIndex].color.set(COLOR_HEX_MAP[state.activeColor]);
+                    extract2DStateFrom3D();
+                    validateCube();
+                }
+            }
+        }
+    });
 }
 
 /**

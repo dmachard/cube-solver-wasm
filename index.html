@@ -63,37 +63,11 @@
         <!-- Main Workspace (Responsive Dual-Panel Grid) -->
         <main class="workspace">
 
-            <!-- LEFT PANEL: 2D Editor & Color Palette -->
-            <section class="panel editor-panel">
+            <!-- SINGLE PANEL: 3D Render, Palette & Interactive Player -->
+            <section class="panel visualizer-panel">
                 <div class="panel-header">
-                    <h2 data-i18n="2d-config">2D Configuration</h2>
-                    <p class="panel-desc" data-i18n="2d-desc">Paint the squares below to match your physical cube's
-                        current state.</p>
-                </div>
-
-                <!-- View Mode Toggle Group -->
-                <div class="view-mode-container">
-                    <button id="btn-view-single" class="view-mode-btn active" data-view="single" data-i18n="view-single">Face par face</button>
-                    <button id="btn-view-unfolded" class="view-mode-btn" data-view="unfolded" data-i18n="view-unfolded">Patron déplié</button>
-                </div>
-
-                <!-- Face Selector (Mobile & Desktop) -->
-                <div class="face-selector-container" id="face-selector-group">
-                    <label data-i18n="select-face">Sélectionner la face à éditer :</label>
-                    <div class="face-tabs" id="face-tabs">
-                        <button class="face-tab active" data-face="u" data-i18n="face-u" data-i18n-title="face-u-desc"
-                            title="Haut (Blanc)">Haut</button>
-                        <button class="face-tab" data-face="l" data-i18n="face-l" data-i18n-title="face-l-desc"
-                            title="Gauche (Orange)">Gauche</button>
-                        <button class="face-tab" data-face="f" data-i18n="face-f" data-i18n-title="face-f-desc"
-                            title="Devant (Vert)">Devant</button>
-                        <button class="face-tab" data-face="r" data-i18n="face-r" data-i18n-title="face-r-desc"
-                            title="Droite (Rouge)">Droite</button>
-                        <button class="face-tab" data-face="b" data-i18n="face-b" data-i18n-title="face-b-desc"
-                            title="Arrière (Bleu)">Arrière</button>
-                        <button class="face-tab" data-face="d" data-i18n="face-d" data-i18n-title="face-d-desc"
-                            title="Bas (Jaune)">Bas</button>
-                    </div>
+                    <h2 data-i18n="3d-visualizer">3D Visualizer</h2>
+                    <p class="panel-desc" data-i18n="2d-desc">Select a color below and paint directly on the 3D cube to match your physical cube's state.</p>
                 </div>
 
                 <!-- Interactive Color Palette -->
@@ -154,44 +128,10 @@
                     </div>
                 </div>
 
-                <!-- 2D Single Face / Net Layout -->
-                <div class="net-wrapper">
-                    <div class="cube-net single-face-mode" id="cube-net">
-                        <!-- 6 faces -->
-                        <div class="face face-u active-face"></div>
-                        <div class="face face-l"></div>
-                        <div class="face face-f"></div>
-                        <div class="face face-r"></div>
-                        <div class="face face-b"></div>
-                        <div class="face face-d"></div>
-                    </div>
-                </div>
-
                 <!-- Editor Action Buttons -->
                 <div class="editor-actions">
                     <button id="btn-reset" class="btn-secondary" data-i18n="reset-solved">🗑️ Reset to Solved</button>
-                    <button id="btn-random" class="btn-secondary" data-i18n="random-scramble">🎲 Random
-                        Scramble</button>
-                </div>
-
-                <!-- Verification Box (Crucial for validation status) -->
-                <div class="validation-box warning" id="validation-box">
-                    <span id="validation-message" data-i18n="wasm-loading">Loading Rust/WASM Engine...</span>
-                </div>
-
-                <!-- Main Action Button -->
-                <button id="btn-solve" class="btn-primary" disabled data-i18n="solve-cube">
-                    <span class="btn-text">Solve Cube</span>
-                    <div class="loader hidden"></div>
-                </button>
-            </section>
-
-            <!-- RIGHT PANEL: 3D Render & Interactive Player -->
-            <section class="panel visualizer-panel">
-                <div class="panel-header">
-                    <h2 data-i18n="3d-visualizer">3D Visualizer</h2>
-                    <p class="panel-desc" data-i18n="3d-desc">Interact with the 3D model. Rotate, zoom, and play the
-                        solving moves.</p>
+                    <button id="btn-random" class="btn-secondary" data-i18n="random-scramble">🎲 Random Scramble</button>
                 </div>
 
                 <!-- Three.js Canvas Container -->
@@ -207,6 +147,17 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Verification Box (Crucial for validation status) -->
+                <div class="validation-box warning" id="validation-box">
+                    <span id="validation-message" data-i18n="wasm-loading">Loading Rust/WASM Engine...</span>
+                </div>
+
+                <!-- Main Action Button -->
+                <button id="btn-solve" class="btn-primary" disabled data-i18n="solve-cube">
+                    <span class="btn-text">Solve Cube</span>
+                    <div class="loader hidden"></div>
+                </button>
             </section>
 
         </main>

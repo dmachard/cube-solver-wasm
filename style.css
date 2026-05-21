@@ -166,13 +166,13 @@ body {
     line-height: 1.5;
 }
 
-/* Responsive Grid for Dual Panels */
+/* Responsive Single Column Layout */
 .workspace {
     display: grid;
-    grid-template-columns: 1fr 1.15fr;
+    grid-template-columns: 1fr;
     gap: 32px;
     align-items: stretch;
-    /* Automatically forces both panels to have equal height */
+    width: 100%;
 }
 
 @media (max-width: 968px) {
@@ -218,9 +218,8 @@ body {
     gap: 28px;
     min-width: 0;
     /* Prevents grid/flex items from expanding past their columns */
-    min-height: 820px;
+    min-height: 500px;
     height: auto;
-    /* Prevent cutoff on smaller PC heights and guarantee symmetry */
 }
 
 /* Explicit class for the 3D visualizer to lock its dimensions */
@@ -709,7 +708,7 @@ body {
     width: 100%;
     flex: 1 1 auto;
     /* Grow and shrink dynamically inside the visualizer panel */
-    min-height: 200px;
+    min-height: 400px;
     border-radius: 12px;
     background: #0f172a;
     /* Clean slate-900 background for 3D model contrast */
@@ -725,7 +724,7 @@ body {
 
 @media (max-width: 480px) {
     .visualizer-panel {
-        height: 520px;
+        height: auto;
         /* Keep visualizer card compact on small devices */
     }
 }

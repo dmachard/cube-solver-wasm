@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import http.server
 import socketserver
-PORT = 8080
+PORT = 8081
 class WasmHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
         # Permettre le Cross-Origin pour les ressources partagées (sécurité CORS)

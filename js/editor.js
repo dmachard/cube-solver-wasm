@@ -18,26 +18,6 @@ export function init2DNet() {
         });
     });
 
-    // 2. Setup Face Selector Tabs
-    const faceTabs = document.querySelectorAll(".face-tab");
-    faceTabs.forEach(tab => {
-        tab.addEventListener("click", () => {
-            // Update Active Tab Button
-            faceTabs.forEach(t => t.classList.remove("active"));
-            tab.classList.add("active");
-
-            // Update Active Face in the Net
-            const selectedFace = tab.dataset.face;
-            const faces = document.querySelectorAll(".face");
-            faces.forEach(f => {
-                f.classList.remove("active-face");
-                if (f.classList.contains(`face-${selectedFace}`)) {
-                    f.classList.add("active-face");
-                }
-            });
-        });
-    });
-
     // 3. Setup Reset Button
     document.getElementById("btn-reset").addEventListener("click", () => {
         resetCubeToSolved();
@@ -51,51 +31,10 @@ export function init2DNet() {
         stopActivePlayback();
     });
 
-    // 4. Setup View Mode Toggle (Single vs Unfolded)
-    const btnSingle = document.getElementById("btn-view-single");
-    const btnUnfolded = document.getElementById("btn-view-unfolded");
-    if (btnSingle && btnUnfolded) {
-        btnSingle.addEventListener("click", () => setViewMode("single"));
-        btnUnfolded.addEventListener("click", () => setViewMode("unfolded"));
-    }
-
-    // Determine initial view mode
-    const savedMode = localStorage.getItem("cube-solver-view-mode");
-    const initialMode = savedMode || (window.innerWidth <= 576 ? "single" : "unfolded");
-    setViewMode(initialMode);
-
     // 5. Initial load: Set cube to solved state
     resetCubeToSolved();
 }
 
-/**
- * Switch view mode of the 2D Net editor
- */
-export function setViewMode(mode) {
-    const net = document.getElementById("cube-net");
-    const faceGroup = document.getElementById("face-selector-group");
-    const btnSingle = document.getElementById("btn-view-single");
-    const btnUnfolded = document.getElementById("btn-view-unfolded");
-
-    if (!net || !btnSingle || !btnUnfolded) return;
-
-    if (mode === "unfolded") {
-        net.classList.remove("single-face-mode");
-        net.classList.add("unfolded-mode");
-        if (faceGroup) faceGroup.classList.add("hidden-view");
-        
-        btnSingle.classList.remove("active");
-        btnUnfolded.classList.add("active");
-    } else {
-        net.classList.remove("unfolded-mode");
-        net.classList.add("single-face-mode");
-        if (faceGroup) faceGroup.classList.remove("hidden-view");
-        
-        btnUnfolded.classList.remove("active");
-        btnSingle.classList.add("active");
-    }
-    localStorage.setItem("cube-solver-view-mode", mode);
-}
 
 /**
  * Helper to reset the active steps timeline when configuration changes
@@ -111,58 +50,13 @@ export function resetCubeToSolved() {
     const solvedString = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB";
     state.cubeState = solvedString.split('');
 
-    render2DNet();
     build3DCube(); // Completely rebuild 3D meshes to clear rotations
     validateCube();
 }
 
-/**
- * Dynamically renders the 9 interactive buttons inside each of the 6 faces
- */
 export function render2DNet() {
-    FACE_ORDER.forEach(faceName => {
-        const faceContainer = document.querySelector(`.face-${faceName.toLowerCase()}`);
-        if (!faceContainer) return;
-
-        faceContainer.innerHTML = ''; // Clear previous facelets
-        const offset = FACELET_OFFSET[faceName];
-
-        for (let i = 0; i < 9; i++) {
-            const index = offset + i;
-            const btn = document.createElement("button");
-            btn.classList.add("facelet");
-            btn.dataset.index = index;
-
-            // Set the correct background color class based on the cubeState
-            const colorChar = state.cubeState[index];
-            btn.classList.add(`c-${colorChar.toLowerCase()}`);
-
-            // Lock central facelets (index 4 in each 0-8 face offset) to prevent illegal centers
-            if (i === 4) {
-                btn.classList.add("center-lock");
-                btn.title = `${t('fixed-center')} ${t('face-' + faceName.toLowerCase())}`;
-                btn.textContent = faceName;
-            } else {
-                // Interactive painting click event
-                btn.addEventListener("click", (e) => {
-                    e.preventDefault();
-
-                    // Replace color in internal array
-                    state.cubeState[index] = state.activeColor;
-
-                    // Re-render only this button to avoid rebuild lag
-                    btn.className = "facelet"; // reset classes
-                    btn.classList.add(`c-${state.activeColor.toLowerCase()}`);
-
-                    // Update 3D canvas colors and validate the new layout
-                    update3DCubeColors();
-                    validateCube();
-                });
-            }
-
-            faceContainer.appendChild(btn);
-        }
-    });
+    // Empty: 2D net is removed, and we shouldn't call update3DCubeColors here
+    // because it assumes the cube is unrotated and breaks the physical rotation state.
 }
 
 /**
@@ -235,6 +129,5 @@ export function generateRandomValidState() {
 
     // 3. Extract the resulting 2D state from the physical 3D positions
     extract2DStateFrom3D();
-    render2DNet();
     validateCube();
 }
