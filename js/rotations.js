@@ -1,7 +1,5 @@
 import { state } from './constants.js';
 import { cubies, scene, extract2DStateFrom3D } from './visualizer.js';
-import { render2DNet } from './editor.js';
-
 /**
  * Animates a single face rotation using a temporary 3D pivot group and GSAP
  * @param {string} move The move string (e.g. "R", "U2", "F'")
@@ -128,7 +126,6 @@ export function animateMove(move, duration = 350) {
 
                 // Update 2D net array to mirror the 3D physical rotation state using 3D-to-2D projection
                 extract2DStateFrom3D();
-                render2DNet();
 
                 state.isAnimating = false;
                 resolve();
@@ -141,56 +138,6 @@ export function animateMove(move, duration = 350) {
     });
 }
 
-/**
- * Permanently mutates the state.cubeState matching the physical 3D turn
- * (Same implementation as applyMoveInstantly to synchronize 2D net representation)
- */
-function applyMoveTo2DState(move) {
-    const base = move.charAt(0);
-    const suffix = move.substring(1);
-
-    let turns = 1;
-    if (suffix === "'") turns = 3;
-    if (suffix === "2") turns = 2;
-
-    for (let t = 0; t < turns; t++) {
-        const temp = [...state.cubeState];
-
-        switch (base) {
-            case 'U':
-                permute(temp, [0, 2, 8, 6]);
-                permute(temp, [1, 5, 7, 3]);
-                permuteBoundary(temp, [18, 19, 20], [36, 37, 38], [45, 46, 47], [9, 10, 11]);
-                break;
-            case 'D':
-                permute(temp, [27, 29, 35, 33]);
-                permute(temp, [28, 32, 34, 30]);
-                permuteBoundary(temp, [24, 25, 26], [15, 16, 17], [51, 52, 53], [42, 43, 44]);
-                break;
-            case 'R':
-                permute(temp, [9, 11, 17, 15]);
-                permute(temp, [10, 14, 16, 12]);
-                permuteBoundary(temp, [2, 5, 8], [45, 48, 51], [35, 32, 29], [26, 23, 20]);
-                break;
-            case 'L':
-                permute(temp, [36, 38, 44, 42]);
-                permute(temp, [37, 41, 43, 39]);
-                permuteBoundary(temp, [6, 3, 0], [18, 21, 24], [27, 30, 33], [53, 50, 47]);
-                break;
-            case 'F':
-                permute(temp, [18, 20, 26, 24]);
-                permute(temp, [19, 23, 25, 21]);
-                permuteBoundary(temp, [6, 7, 8], [9, 12, 15], [29, 28, 27], [44, 41, 38]);
-                break;
-            case 'B':
-                permute(temp, [45, 47, 53, 51]);
-                permute(temp, [46, 50, 52, 48]);
-                permuteBoundary(temp, [2, 1, 0], [36, 39, 42], [35, 34, 33], [17, 14, 11]);
-                break;
-        }
-        state.cubeState = temp;
-    }
-}
 
 /**
  * Rotates a slice instantly in 3D space (used for shuffling/scrambling)
@@ -279,20 +226,3 @@ export function applyMoveInstantly3D(move) {
     scene.remove(pivot);
 }
 
-function permute(arr, [idx1, idx2, idx3, idx4]) {
-    const temp = arr[idx4];
-    arr[idx4] = arr[idx3];
-    arr[idx3] = arr[idx2];
-    arr[idx2] = arr[idx1];
-    arr[idx1] = temp;
-}
-
-function permuteBoundary(arr, side1, side2, side3, side4) {
-    const temp = [arr[side4[0]], arr[side4[1]], arr[side4[2]]];
-    for (let i = 0; i < 3; i++) {
-        arr[side4[i]] = arr[side3[i]];
-        arr[side3[i]] = arr[side2[i]];
-        arr[side2[i]] = arr[side1[i]];
-        arr[side1[i]] = temp[i];
-    }
-}

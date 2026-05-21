@@ -54,10 +54,7 @@ export function resetCubeToSolved() {
     validateCube();
 }
 
-export function render2DNet() {
-    // Empty: 2D net is removed, and we shouldn't call update3DCubeColors here
-    // because it assumes the cube is unrotated and breaks the physical rotation state.
-}
+
 
 /**
  * Validates the current cube color configuration in real-time
@@ -96,18 +93,7 @@ export function validateCube() {
     }
 }
 
-// Helper to translate color initials to human names
-function getColorName(char) {
-    switch (char) {
-        case 'U': return 'White';
-        case 'L': return 'Orange';
-        case 'F': return 'Green';
-        case 'R': return 'Red';
-        case 'B': return 'Blue';
-        case 'D': return 'Yellow';
-        default: return 'Unknown';
-    }
-}
+
 
 /**
  * Scrambles the cube using physical moves to guarantee mathematical solvability

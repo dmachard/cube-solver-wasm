@@ -4,7 +4,7 @@ import init, { solve, version } from './pkg/cube_solver_wasm.js';
 // 2. Import our clean modular specialized scripts
 import { state } from './js/constants.js';
 import { init3DVisualizer } from './js/visualizer.js';
-import { init2DNet, validateCube, render2DNet } from './js/editor.js';
+import { init2DNet, validateCube } from './js/editor.js';
 import { initPlayerControls, showSolution } from './js/player.js';
 import { initLanguage, setLanguage, t } from './js/i18n.js';
 import { initThemeScheme, setThemeScheme } from './js/theme.js';
@@ -22,7 +22,6 @@ async function startApplication() {
         if (themeSelect) {
             themeSelect.addEventListener("change", (e) => {
                 setThemeScheme(e.target.value);
-                render2DNet();
                 validateCube();
             });
         }
@@ -33,7 +32,6 @@ async function startApplication() {
         if (langSelect) {
             langSelect.addEventListener("change", (e) => {
                 setLanguage(e.target.value);
-                render2DNet();
                 validateCube();
             });
         }
