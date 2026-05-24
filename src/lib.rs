@@ -44,3 +44,53 @@ pub fn solve(cube_string: &str) -> String {
 pub fn version() -> String {
     env!("CARGO_PKG_VERSION").to_string()
 }
+
+/// Validate if a given 54-character cube string represents a mathematically solvable state.
+#[wasm_bindgen]
+pub fn is_valid_state(cube_string: &str) -> bool {
+    let face_cube = match FaceCube::try_from(cube_string) {
+        Ok(fc) => fc,
+        Err(_) => return false,
+    };
+
+    match CubieCube::try_from(&face_cube) {
+        Ok(_) => true,
+        Err(_) => false,
+    }
+}
+
+/// Generate a valid scramble sequence of a given length
+#[wasm_bindgen]
+pub fn generate_scramble(length: usize) -> String {
+    let faces = ["U", "D", "R", "L", "F", "B"];
+    let modifiers = ["", "'", "2"];
+
+    let mut scramble = Vec::new();
+    let mut last_face = 255;
+    let mut before_last_face = 255;
+
+    for _ in 0..length {
+        let mut face;
+        loop {
+            face = (js_sys::Math::random() * 6.0).floor() as usize;
+            // Avoid repeating the same face (e.g. U U')
+            if face == last_face {
+                continue;
+            }
+            // Avoid sequences like U D U, where U and D are opposite faces
+            // In our array: U=0, D=1 (opposites), R=2, L=3 (opposites), F=4, B=5 (opposites)
+            if face == before_last_face && (face / 2 == last_face / 2) {
+                continue;
+            }
+            break;
+        }
+        before_last_face = last_face;
+        last_face = face;
+
+        let modifier = (js_sys::Math::random() * 3.0).floor() as usize;
+        let move_str = format!("{}{}", faces[face], modifiers[modifier]);
+        scramble.push(move_str);
+    }
+
+    scramble.join(" ")
+}

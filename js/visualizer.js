@@ -113,7 +113,7 @@ function setupRaycaster() {
 
                 if (!isCenter) {
                     cubie.material[materialIndex].color.set(COLOR_HEX_MAP[state.activeColor]);
-                    extract2DStateFrom3D();
+                    getSolverStringFrom3D();
                     validateCube();
                 }
             }
@@ -236,7 +236,7 @@ export function update3DCubeColors() {
  * Extract 2D state from the 3D cubies positions and material orientations
  * This makes the 3D scene the single source of truth, avoiding any mathematical drift.
  */
-export function extract2DStateFrom3D() {
+export function getSolverStringFrom3D() {
     const tempState = Array(54).fill('U');
 
     cubies.forEach(cubie => {

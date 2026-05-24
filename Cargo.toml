@@ -1,6 +1,6 @@
 [package]
 name = "cube-solver-wasm"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 description = "A Rubik's Cube solver in Rust compiled to WebAssembly using Kociemba's two-phase algorithm."
 repository = "https://github.com/dmachard/cube-solver-wasm"
@@ -17,3 +17,7 @@ wasm-bindgen = "0.2"
 kewb = "0.4.3"
 # for random generation https://github.com/rust-random/getrandom
 getrandom = { version = "0.3", features = ["wasm_js"] }
+js-sys = "0.3.98"
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"

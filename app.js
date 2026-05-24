@@ -36,17 +36,17 @@ async function startApplication() {
             });
         }
 
-        // 1. Initialize our modular components in order
+        // 1. Load the WebAssembly binary locally into the browser linear memory first
+        await init();
+        wasmModule = true; // Set loaded flag
+
+        // 2. Initialize our modular components in order
         init3DVisualizer();
         initEditorControls();
         initPlayerControls();
 
         // Initialize timeline to Étape 0 immediately on startup so it is always visible!
         showSolution("", 0);
-
-        // 2. Load the WebAssembly binary locally into the browser linear memory
-        await init();
-        wasmModule = true; // Set loaded flag
 
         // Populate application version dynamically from WASM
         const versionEl = document.querySelector(".app-version");

@@ -1,5 +1,5 @@
 import { state } from './constants.js';
-import { cubies, scene, extract2DStateFrom3D } from './visualizer.js';
+import { cubies, scene, getSolverStringFrom3D } from './visualizer.js';
 /**
  * Animates a single face rotation using a temporary 3D pivot group and GSAP
  * @param {string} move The move string (e.g. "R", "U2", "F'")
@@ -125,7 +125,7 @@ export function animateMove(move, duration = 350) {
                 scene.remove(pivot);
 
                 // Update 2D net array to mirror the 3D physical rotation state using 3D-to-2D projection
-                extract2DStateFrom3D();
+                getSolverStringFrom3D();
 
                 state.isAnimating = false;
                 resolve();

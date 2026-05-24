@@ -1,8 +1,9 @@
 import { FACE_ORDER, state } from './constants.js';
-import { build3DCube, extract2DStateFrom3D } from './visualizer.js';
+import { build3DCube, getSolverStringFrom3D } from './visualizer.js';
 import { applyMoveInstantly3D } from './rotations.js';
 import { showSolution } from './player.js';
 import { t } from './i18n.js';
+import { generate_scramble, is_valid_state } from '../pkg/cube_solver_wasm.js';
 
 /**
  * Initializes the color palette and action buttons
@@ -83,9 +84,16 @@ export function validateCube() {
     });
 
     if (isValid) {
-        validationBox.className = "validation-box success";
-        validationMsg.textContent = t('wasm-ready');
-        solveBtn.disabled = false;
+        const cubeString = state.cubeState.join('');
+        if (is_valid_state(cubeString)) {
+            validationBox.className = "validation-box success";
+            validationMsg.textContent = t('wasm-ready');
+            solveBtn.disabled = false;
+        } else {
+            validationBox.className = "validation-box warning";
+            validationMsg.textContent = t('invalid-geometry');
+            solveBtn.disabled = true;
+        }
     } else {
         validationBox.className = "validation-box warning";
         validationMsg.textContent = `${t('invalid-counts')}${errors.join(', ')}`;
@@ -104,16 +112,17 @@ export function generateRandomValidState() {
     state.cubeState = solved.split('');
     build3DCube(); 
 
-    // 2. Generate random sequence of moves and rotate physical 3D cubies instantly
-    const moves = ['U', "U'", 'U2', 'D', "D'", 'D2', 'R', "R'", 'R2', 'L', "L'", 'L2', 'F', "F'", 'F2', 'B', "B'", 'B2'];
+    // 2. Generate mathematically valid random scramble sequence via Rust WASM
     const scrambleLength = 20 + Math.floor(Math.random() * 10); // 20-30 moves
+    const scrambleString = generate_scramble(scrambleLength);
+    const moves = scrambleString.split(' ');
 
-    for (let s = 0; s < scrambleLength; s++) {
-        const randomMove = moves[Math.floor(Math.random() * moves.length)];
-        applyMoveInstantly3D(randomMove);
+    // 3. Rotate physical 3D cubies instantly
+    for (const move of moves) {
+        if (move) applyMoveInstantly3D(move);
     }
 
-    // 3. Extract the resulting 2D state from the physical 3D positions
-    extract2DStateFrom3D();
+    // 4. Extract the resulting 2D state from the physical 3D positions
+    getSolverStringFrom3D();
     validateCube();
 }

@@ -25,3 +25,28 @@ fn test_invalid_cube_facets() {
             || solution.contains("Error: Invalid configuration")
     );
 }
+
+#[test]
+fn test_is_valid_state_true() {
+    let solved = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB";
+    assert!(cube_solver_wasm::is_valid_state(solved));
+}
+
+#[test]
+fn test_is_valid_state_false_invalid_char() {
+    let invalid = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBC";
+    assert!(!cube_solver_wasm::is_valid_state(invalid));
+}
+
+#[test]
+fn test_is_valid_state_false_impossible_geometry() {
+    // A cube with 9 of each color, but one corner twisted (impossible to solve)
+    // To do this simply, we can just take a solved string and swap two corners' colors.
+    // Or simpler: F and B centers swapped (also impossible, centers are fixed normally, but let's just make an impossible edge)
+    // Here we swap a U and R sticker on an edge to create a flipped edge parity.
+    let mut chars: Vec<char> = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB".chars().collect();
+    chars.swap(5, 10); // Swap U right edge with R top edge
+    let impossible: String = chars.into_iter().collect();
+    assert!(!cube_solver_wasm::is_valid_state(&impossible));
+}
+
