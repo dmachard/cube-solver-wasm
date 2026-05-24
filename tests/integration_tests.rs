@@ -44,7 +44,9 @@ fn test_is_valid_state_false_impossible_geometry() {
     // To do this simply, we can just take a solved string and swap two corners' colors.
     // Or simpler: F and B centers swapped (also impossible, centers are fixed normally, but let's just make an impossible edge)
     // Here we swap a U and R sticker on an edge to create a flipped edge parity.
-    let mut chars: Vec<char> = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB".chars().collect();
+    let mut chars: Vec<char> = "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"
+        .chars()
+        .collect();
     chars.swap(5, 10); // Swap U right edge with R top edge
     let impossible: String = chars.into_iter().collect();
     assert!(!cube_solver_wasm::is_valid_state(&impossible));
@@ -167,4 +169,3 @@ fn test_calculate_rotation_target() {
     assert_eq!(target_by, -1.0);
     assert_eq!(target_bz, 1.0);
 }
-

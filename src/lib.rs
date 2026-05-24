@@ -53,17 +53,25 @@ struct Mat3 {
 impl Mat3 {
     fn from_quat(q: &[f32; 4]) -> Self {
         let (qx, qy, qz, qw) = (q[0], q[1], q[2], q[3]);
-        let x2 = qx + qx; let y2 = qy + qy; let z2 = qz + qz;
-        let xx = qx * x2; let xy = qx * y2; let xz = qx * z2;
-        let yy = qy * y2; let yz = qy * z2; let zz = qz * z2;
-        let wx = qw * x2; let wy = qw * y2; let wz = qw * z2;
+        let x2 = qx + qx;
+        let y2 = qy + qy;
+        let z2 = qz + qz;
+        let xx = qx * x2;
+        let xy = qx * y2;
+        let xz = qx * z2;
+        let yy = qy * y2;
+        let yz = qy * z2;
+        let zz = qz * z2;
+        let wx = qw * x2;
+        let wy = qw * y2;
+        let wz = qw * z2;
 
         let mut mat = Mat3 {
             m: [
                 [1.0 - (yy + zz), xy + wz, xz - wy],
                 [xy - wz, 1.0 - (xx + zz), yz + wx],
-                [xz + wy, yz - wx, 1.0 - (xx + yy)]
-            ]
+                [xz + wy, yz - wx, 1.0 - (xx + yy)],
+            ],
         };
 
         // Perfect integer snapping
@@ -76,9 +84,15 @@ impl Mat3 {
     }
 
     fn to_quat(&self) -> [f32; 4] {
-        let m11 = self.m[0][0]; let m12 = self.m[1][0]; let m13 = self.m[2][0];
-        let m21 = self.m[0][1]; let m22 = self.m[1][1]; let m23 = self.m[2][1];
-        let m31 = self.m[0][2]; let m32 = self.m[1][2]; let m33 = self.m[2][2];
+        let m11 = self.m[0][0];
+        let m12 = self.m[1][0];
+        let m13 = self.m[2][0];
+        let m21 = self.m[0][1];
+        let m22 = self.m[1][1];
+        let m23 = self.m[2][1];
+        let m31 = self.m[0][2];
+        let m32 = self.m[1][2];
+        let m33 = self.m[2][2];
 
         let trace = m11 + m22 + m33;
         if trace > 0.0 {
@@ -100,9 +114,18 @@ impl Mat3 {
 fn rotate_cw(v: &mut Vec3, axis: char) {
     let (x, y, z) = (v.x, v.y, v.z);
     match axis {
-        'x' => { v.y = z; v.z = -y; }, // -90 deg around X (ThreeJS right-handed)
-        'y' => { v.x = -z; v.z = x; }, // -90 deg around Y
-        'z' => { v.x = y; v.y = -x; }, // -90 deg around Z
+        'x' => {
+            v.y = z;
+            v.z = -y;
+        } // -90 deg around X (ThreeJS right-handed)
+        'y' => {
+            v.x = -z;
+            v.z = x;
+        } // -90 deg around Y
+        'z' => {
+            v.x = y;
+            v.y = -x;
+        } // -90 deg around Z
         _ => {}
     }
 }
@@ -166,21 +189,69 @@ pub fn extract_state_from_3d(positions: &[f32], quaternions: &[f32], face_colors
     let colors_chars: Vec<char> = face_colors.chars().collect();
 
     let world_normals = [
-        Vec3 { x: 1.0, y: 0.0, z: 0.0 },   // +x
-        Vec3 { x: -1.0, y: 0.0, z: 0.0 },  // -x
-        Vec3 { x: 0.0, y: 1.0, z: 0.0 },   // +y
-        Vec3 { x: 0.0, y: -1.0, z: 0.0 },  // -y
-        Vec3 { x: 0.0, y: 0.0, z: 1.0 },   // +z
-        Vec3 { x: 0.0, y: 0.0, z: -1.0 },  // -z
+        Vec3 {
+            x: 1.0,
+            y: 0.0,
+            z: 0.0,
+        }, // +x
+        Vec3 {
+            x: -1.0,
+            y: 0.0,
+            z: 0.0,
+        }, // -x
+        Vec3 {
+            x: 0.0,
+            y: 1.0,
+            z: 0.0,
+        }, // +y
+        Vec3 {
+            x: 0.0,
+            y: -1.0,
+            z: 0.0,
+        }, // -y
+        Vec3 {
+            x: 0.0,
+            y: 0.0,
+            z: 1.0,
+        }, // +z
+        Vec3 {
+            x: 0.0,
+            y: 0.0,
+            z: -1.0,
+        }, // -z
     ];
 
     let local_normals = [
-        Vec3 { x: 1.0, y: 0.0, z: 0.0 },
-        Vec3 { x: -1.0, y: 0.0, z: 0.0 },
-        Vec3 { x: 0.0, y: 1.0, z: 0.0 },
-        Vec3 { x: 0.0, y: -1.0, z: 0.0 },
-        Vec3 { x: 0.0, y: 0.0, z: 1.0 },
-        Vec3 { x: 0.0, y: 0.0, z: -1.0 },
+        Vec3 {
+            x: 1.0,
+            y: 0.0,
+            z: 0.0,
+        },
+        Vec3 {
+            x: -1.0,
+            y: 0.0,
+            z: 0.0,
+        },
+        Vec3 {
+            x: 0.0,
+            y: 1.0,
+            z: 0.0,
+        },
+        Vec3 {
+            x: 0.0,
+            y: -1.0,
+            z: 0.0,
+        },
+        Vec3 {
+            x: 0.0,
+            y: 0.0,
+            z: 1.0,
+        },
+        Vec3 {
+            x: 0.0,
+            y: 0.0,
+            z: -1.0,
+        },
     ];
 
     for i in 0..26 {
@@ -249,9 +320,17 @@ pub fn extract_state_from_3d(positions: &[f32], quaternions: &[f32], face_colors
 /// Calculates the exact target mathematical position and quaternion for all 26 cubies after a rotation move.
 /// Returns a flat Float32Array of length 26 * 7 = 182 containing [x,y,z, qx,qy,qz,qw] for each cubie.
 #[wasm_bindgen]
-pub fn calculate_rotation_target(positions: &[f32], quaternions: &[f32], move_str: &str) -> Vec<f32> {
+pub fn calculate_rotation_target(
+    positions: &[f32],
+    quaternions: &[f32],
+    move_str: &str,
+) -> Vec<f32> {
     let base = move_str.chars().nth(0).unwrap_or('U');
-    let suffix = if move_str.len() > 1 { move_str.chars().nth(1).unwrap() } else { ' ' };
+    let suffix = if move_str.len() > 1 {
+        move_str.chars().nth(1).unwrap()
+    } else {
+        ' '
+    };
 
     let (axis, filter_val, mut turns) = match base {
         'U' => ('y', 1, 1),
@@ -298,18 +377,36 @@ pub fn calculate_rotation_target(positions: &[f32], quaternions: &[f32], move_st
         if belongs {
             for _ in 0..cw_rotations {
                 rotate_cw(&mut pos, axis);
-                
-                let mut vx = Vec3 { x: mat.m[0][0], y: mat.m[0][1], z: mat.m[0][2] };
-                let mut vy = Vec3 { x: mat.m[1][0], y: mat.m[1][1], z: mat.m[1][2] };
-                let mut vz = Vec3 { x: mat.m[2][0], y: mat.m[2][1], z: mat.m[2][2] };
-                
+
+                let mut vx = Vec3 {
+                    x: mat.m[0][0],
+                    y: mat.m[0][1],
+                    z: mat.m[0][2],
+                };
+                let mut vy = Vec3 {
+                    x: mat.m[1][0],
+                    y: mat.m[1][1],
+                    z: mat.m[1][2],
+                };
+                let mut vz = Vec3 {
+                    x: mat.m[2][0],
+                    y: mat.m[2][1],
+                    z: mat.m[2][2],
+                };
+
                 rotate_cw(&mut vx, axis);
                 rotate_cw(&mut vy, axis);
                 rotate_cw(&mut vz, axis);
 
-                mat.m[0][0] = vx.x; mat.m[0][1] = vx.y; mat.m[0][2] = vx.z;
-                mat.m[1][0] = vy.x; mat.m[1][1] = vy.y; mat.m[1][2] = vy.z;
-                mat.m[2][0] = vz.x; mat.m[2][1] = vz.y; mat.m[2][2] = vz.z;
+                mat.m[0][0] = vx.x;
+                mat.m[0][1] = vx.y;
+                mat.m[0][2] = vx.z;
+                mat.m[1][0] = vy.x;
+                mat.m[1][1] = vy.y;
+                mat.m[1][2] = vy.z;
+                mat.m[2][0] = vz.x;
+                mat.m[2][1] = vz.y;
+                mat.m[2][2] = vz.z;
             }
         }
 

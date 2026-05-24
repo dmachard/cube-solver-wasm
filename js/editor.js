@@ -78,8 +78,16 @@ export function validateCube() {
         const count = counts[faceChar];
         if (count !== 9) {
             isValid = false;
-            const faceName = t(`face-${faceChar.toLowerCase()}`);
-            errors.push(`${faceName}: ${count}/9 ${t('squares')}`);
+            const colorKey = {
+                'U': 'color-white',
+                'L': 'color-orange',
+                'F': 'color-green',
+                'R': 'color-red',
+                'B': 'color-blue',
+                'D': 'color-yellow'
+            }[faceChar];
+            const colorName = t(colorKey);
+            errors.push(`${colorName} : ${count}/9`);
         }
     });
 

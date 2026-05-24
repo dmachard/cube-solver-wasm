@@ -35,6 +35,7 @@ export function init3DVisualizer() {
     controls.dampingFactor = 0.05;
     controls.minDistance = 3;
     controls.maxDistance = 15;
+    controls.target.set(0, -0.5, 0); // Point slightly below the cube to move it up visually
 
     // 5. Setup Ambient & Directional Lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);

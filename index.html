@@ -128,6 +128,10 @@
 
                 <!-- Three.js Canvas Container -->
                 <div class="canvas-container" id="canvas-container">
+                    <!-- Verification Box (Crucial for validation status) -->
+                    <div class="validation-box warning" id="validation-box">
+                        <span id="validation-message" data-i18n="wasm-loading">Loading Rust/WASM Engine...</span>
+                    </div>
                 </div>
 
                 <!-- Interactive Media Player for the solution moves (Horizontal Underneath) -->
@@ -138,11 +142,6 @@
                             <!-- Populated dynamically via JS -->
                         </div>
                     </div>
-                </div>
-
-                <!-- Verification Box (Crucial for validation status) -->
-                <div class="validation-box warning" id="validation-box">
-                    <span id="validation-message" data-i18n="wasm-loading">Loading Rust/WASM Engine...</span>
                 </div>
 
                 <!-- Main Action Buttons -->
