@@ -88,7 +88,7 @@ fn test_extract_state_from_3d() {
                         let facelet_index = 36 + (2 - (y + 1)) * 3 + (z + 1);
                         color_char = state_chars[facelet_index as usize];
                     } else if mat_idx == 2 && y == 1 {
-                        let facelet_index = 0 + (z + 1) * 3 + (x + 1);
+                        let facelet_index = (z + 1) * 3 + (x + 1);
                         color_char = state_chars[facelet_index as usize];
                     } else if mat_idx == 3 && y == -1 {
                         let facelet_index = 27 + (2 - (z + 1)) * 3 + (x + 1);

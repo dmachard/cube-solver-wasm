@@ -15,7 +15,7 @@ export const translations = {
         "wasm-loading": "Loading Rust/WASM Engine...",
         "wasm-loaded": "✓ WASM Rust Engine loaded successfully.",
         "wasm-failed": "Failed to load WASM engine. Check console errors.",
-        "wasm-ready": "✓ WASM Ready (exactly 9 squares per color).",
+        "wasm-ready": "✓ Exactly 9 squares per color.",
         "solution-found": "✓ Solution found!",
         "invalid-counts": "⚠️ Invalid counts: ",
         "invalid-geometry": "⚠️ Impossible geometry (flipped edge/corner)",
@@ -30,7 +30,7 @@ export const translations = {
         "custom-colors-title": "Customize colors:",
         "view-single": "Face by Face",
         "view-unfolded": "Unfolded Net",
-        
+
         // Colors
         "color-white": "White",
         "color-orange": "Orange",
@@ -38,7 +38,7 @@ export const translations = {
         "color-red": "Red",
         "color-blue": "Blue",
         "color-yellow": "Yellow",
-        
+
         // Faces
         "face-u": "Up",
         "face-l": "Left",
@@ -46,7 +46,7 @@ export const translations = {
         "face-r": "Right",
         "face-b": "Back",
         "face-d": "Down",
-        
+
         // Tooltips
         "face-u-desc": "Up (White)",
         "face-l-desc": "Left (Orange)",
@@ -78,7 +78,7 @@ export const translations = {
         "wasm-loading": "Chargement du moteur Rust/WASM...",
         "wasm-loaded": "✓ Moteur WASM Rust chargé avec succès.",
         "wasm-failed": "Échec du chargement du moteur WASM. Vérifiez les erreurs de la console.",
-        "wasm-ready": "✓ Prêt WASM (exactement 9 carrés par couleur).",
+        "wasm-ready": "✓ Exactement 9 carrés par couleur.",
         "solution-found": "✓ Solution trouvée !",
         "invalid-counts": "⚠️ Nombre incorrect : ",
         "invalid-geometry": "⚠️ Géométrie impossible (arête ou coin inversé)",
@@ -93,7 +93,7 @@ export const translations = {
         "custom-colors-title": "Personnaliser les couleurs :",
         "view-single": "Face par face",
         "view-unfolded": "Patron déplié",
-        
+
         // Colors
         "color-white": "Blanc",
         "color-orange": "Orange",
@@ -101,7 +101,7 @@ export const translations = {
         "color-red": "Rouge",
         "color-blue": "Bleu",
         "color-yellow": "Jaune",
-        
+
         // Faces
         "face-u": "Haut",
         "face-l": "Gauche",
@@ -109,7 +109,7 @@ export const translations = {
         "face-r": "Droite",
         "face-b": "Arrière",
         "face-d": "Bas",
-        
+
         // Tooltips
         "face-u-desc": "Haut (Blanc)",
         "face-l-desc": "Gauche (Orange)",
@@ -147,13 +147,13 @@ export function initLanguage() {
             currentLang = browserLang;
         }
     }
-    
+
     // Set the select element's value
     const select = document.getElementById('lang-select');
     if (select) {
         select.value = currentLang;
     }
-    
+
     updateDOMTranslations();
 }
 

@@ -176,10 +176,7 @@ pub fn is_valid_state(cube_string: &str) -> bool {
         Err(_) => return false,
     };
 
-    match CubieCube::try_from(&face_cube) {
-        Ok(_) => true,
-        Err(_) => false,
-    }
+    CubieCube::try_from(&face_cube).is_ok()
 }
 
 /// Extracts the 54-char Kociemba 2D state from the 3D physical state (positions, quaternions, and face colors).
@@ -290,7 +287,7 @@ pub fn extract_state_from_3d(positions: &[f32], quaternions: &[f32], face_colors
                 } else if best_world_dir == 1 && x == -1 {
                     facelet_index = 36 + (2 - (y + 1)) * 3 + (z + 1);
                 } else if best_world_dir == 2 && y == 1 {
-                    facelet_index = 0 + (z + 1) * 3 + (x + 1);
+                    facelet_index = (z + 1) * 3 + (x + 1);
                 } else if best_world_dir == 3 && y == -1 {
                     facelet_index = 27 + (2 - (z + 1)) * 3 + (x + 1);
                 } else if best_world_dir == 4 && z == 1 {
@@ -325,7 +322,7 @@ pub fn calculate_rotation_target(
     quaternions: &[f32],
     move_str: &str,
 ) -> Vec<f32> {
-    let base = move_str.chars().nth(0).unwrap_or('U');
+    let base = move_str.chars().next().unwrap_or('U');
     let suffix = if move_str.len() > 1 {
         move_str.chars().nth(1).unwrap()
     } else {
