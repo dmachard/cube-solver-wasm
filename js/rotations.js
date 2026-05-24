@@ -1,7 +1,8 @@
 import { state } from './constants.js';
 import { cubies, scene, getSolverStringFrom3D } from './visualizer.js';
+import { calculate_rotation_target } from '../pkg/cube_solver_wasm.js';
 /**
- * Animates a single face rotation using a temporary 3D pivot group and GSAP
+ * Animates a single face rotation using GSAP, tweening to the exact target state dictated by Rust
  * @param {string} move The move string (e.g. "R", "U2", "F'")
  * @param {number} duration Animation time in milliseconds
  * @returns {Promise<void>} Resolves when the animation is fully complete
@@ -11,120 +12,86 @@ export function animateMove(move, duration = 350) {
         if (state.isAnimating) return resolve();
         state.isAnimating = true;
 
+        // 1. Serialize current positions and quaternions
+        const positions = new Float32Array(cubies.length * 3);
+        const quaternions = new Float32Array(cubies.length * 4);
+        
+        cubies.forEach((cubie, idx) => {
+            positions[idx * 3] = cubie.position.x;
+            positions[idx * 3 + 1] = cubie.position.y;
+            positions[idx * 3 + 2] = cubie.position.z;
+            quaternions[idx * 4] = cubie.quaternion.x;
+            quaternions[idx * 4 + 1] = cubie.quaternion.y;
+            quaternions[idx * 4 + 2] = cubie.quaternion.z;
+            quaternions[idx * 4 + 3] = cubie.quaternion.w;
+        });
+
+        // 2. Get mathematically perfect target from Rust WASM
+        const targetData = calculate_rotation_target(positions, quaternions, move);
+
+        // 3. Select which axis we are animating around for visual grouping
         const base = move.charAt(0);
         const suffix = move.substring(1);
+        
+        let angle = -Math.PI / 2;
+        if (suffix === "'") angle = Math.PI / 2;
+        if (suffix === "2") angle = -Math.PI;
 
-        // 1. Determine rotation angle (in radians)
-        let angle = -Math.PI / 2; // Default clockwise
-        if (suffix === "'") angle = Math.PI / 2; // Counter-clockwise
-        if (suffix === "2") angle = -Math.PI;      // Double turn
-
-        // 2. Select the axis, normal vector and filtering coordinate condition
-        let axis = 'y';
-        let filterCoordinate = 'y';
-        let filterValue = 0;
-
+        let axis = 'y'; let filterVal = 0;
         switch (base) {
-            case 'U': // Upper face (y = 1)
-                axis = 'y';
-                filterCoordinate = 'y';
-                filterValue = 1;
-                // Clockwise around normal +Y is negative
-                break;
-            case 'D': // Down face (y = -1)
-                axis = 'y';
-                filterCoordinate = 'y';
-                filterValue = -1;
-                // Clockwise around normal -Y is positive around +Y
-                angle = -angle;
-                break;
-            case 'R': // Right face (x = 1)
-                axis = 'x';
-                filterCoordinate = 'x';
-                filterValue = 1;
-                // Clockwise around normal +X is negative
-                break;
-            case 'L': // Left face (x = -1)
-                axis = 'x';
-                filterCoordinate = 'x';
-                filterValue = -1;
-                // Clockwise around normal -X is positive around +X
-                angle = -angle;
-                break;
-            case 'F': // Front face (z = 1)
-                axis = 'z';
-                filterCoordinate = 'z';
-                filterValue = 1;
-                // Clockwise around normal +Z is negative
-                break;
-            case 'B': // Back face (z = -1)
-                axis = 'z';
-                filterCoordinate = 'z';
-                filterValue = -1;
-                // Clockwise around normal -Z is positive around +Z
-                angle = -angle;
-                break;
+            case 'U': axis = 'y'; filterVal = 1; break;
+            case 'D': axis = 'y'; filterVal = -1; angle = -angle; break;
+            case 'R': axis = 'x'; filterVal = 1; break;
+            case 'L': axis = 'x'; filterVal = -1; angle = -angle; break;
+            case 'F': axis = 'z'; filterVal = 1; break;
+            case 'B': axis = 'z'; filterVal = -1; angle = -angle; break;
         }
 
-        // 3. Collect all 9 cubies belonging to this slice
-        const sliceCubies = cubies.filter(cubie => {
-            const coordVal = Math.round(cubie.position[filterCoordinate]);
-            return coordVal === filterValue;
-        });
-
-        // 4. Assemble the temporary pivot group
+        // Group the animating slice just for the GSAP rotation effect
         const pivot = new THREE.Group();
         scene.add(pivot);
+        const sliceCubies = [];
 
-        // Attach cubies to the pivot without altering their world transformation
-        sliceCubies.forEach(cubie => {
-            pivot.attach(cubie);
+        cubies.forEach((cubie, idx) => {
+            // Check if this cubie is moving (its target position/quaternion differs from its current)
+            const targetX = targetData[idx * 7];
+            const targetY = targetData[idx * 7 + 1];
+            const targetZ = targetData[idx * 7 + 2];
+            
+            // Floating point exact check is safe since Rust returns exact integers for positions
+            if (Math.round(cubie.position[axis]) === filterVal) {
+                pivot.attach(cubie);
+                sliceCubies.push({cubie, idx});
+            }
         });
 
-        // 5. Trigger GSAP tween animation
+        // 4. GSAP Tween the visual pivot group
         const tweenVars = {
             duration: duration / 1000,
             ease: "power2.out",
             onComplete: () => {
-                // Snapping: Once finished, re-attach cubies back to root scene
-                sliceCubies.forEach(cubie => {
-                    scene.attach(cubie);
-
-                    // Round positions to perfect integers to discard decimal drift
-                    cubie.position.x = Math.round(cubie.position.x);
-                    cubie.position.y = Math.round(cubie.position.y);
-                    cubie.position.z = Math.round(cubie.position.z);
-
-                    // Perfect Orthogonal Matrix Snapping to completely eliminate Euler twisting artifacts!
-                    cubie.updateMatrix();
-                    const matrix = cubie.matrix.clone();
-                    const elements = matrix.elements;
-
-                    // Deconstruct columns representing local X and Y axes
-                    const xCol = new THREE.Vector3(elements[0], elements[1], elements[2]).normalize();
-                    const yCol = new THREE.Vector3(elements[4], elements[5], elements[6]).normalize();
-
-                    // Snap columns to perfect integer directions (-1, 0, 1)
-                    xCol.set(Math.round(xCol.x), Math.round(xCol.y), Math.round(xCol.z));
-                    yCol.set(Math.round(yCol.x), Math.round(yCol.y), Math.round(yCol.z));
-
-                    // Reconstruct Z column orthogonally via cross product to prevent scaling/shearing
-                    const zCol = new THREE.Vector3().crossVectors(xCol, yCol).normalize();
-
-                    // Apply perfectly snapped values back to matrix elements
-                    elements[0] = xCol.x; elements[1] = xCol.y; elements[2] = xCol.z;
-                    elements[4] = yCol.x; elements[5] = yCol.y; elements[6] = yCol.z;
-                    elements[8] = zCol.x; elements[9] = zCol.y; elements[10] = zCol.z;
-
-                    // Snaps rotation to exact mathematical alignment
-                    cubie.matrix.copy(matrix);
-                    cubie.matrix.decompose(cubie.position, cubie.quaternion, cubie.scale);
+                // Remove pivot group and restore hierarchy
+                sliceCubies.forEach(item => {
+                    scene.attach(item.cubie);
                 });
-
-                // Delete pivot group
                 scene.remove(pivot);
 
-                // Update 2D net array to mirror the 3D physical rotation state using 3D-to-2D projection
+                // 5. Apply the perfect snapped targets from Rust! (Zero floating point drift!)
+                cubies.forEach((cubie, idx) => {
+                    cubie.position.set(
+                        targetData[idx * 7],
+                        targetData[idx * 7 + 1],
+                        targetData[idx * 7 + 2]
+                    );
+                    cubie.quaternion.set(
+                        targetData[idx * 7 + 3],
+                        targetData[idx * 7 + 4],
+                        targetData[idx * 7 + 5],
+                        targetData[idx * 7 + 6]
+                    );
+                });
+
+                // Update 2D internal state based on new exact geometry
                 getSolverStringFrom3D();
 
                 state.isAnimating = false;
@@ -132,7 +99,6 @@ export function animateMove(move, duration = 350) {
             }
         };
 
-        // Select correct axis variable target for GSAP tweening
         tweenVars[axis] = angle;
         gsap.to(pivot.rotation, tweenVars);
     });
@@ -144,85 +110,35 @@ export function animateMove(move, duration = 350) {
  * @param {string} move The move string (e.g. "R", "U2", "F'")
  */
 export function applyMoveInstantly3D(move) {
-    const base = move.charAt(0);
-    const suffix = move.substring(1);
-
-    // 1. Determine rotation angle
-    let angle = -Math.PI / 2;
-    if (suffix === "'") angle = Math.PI / 2;
-    if (suffix === "2") angle = -Math.PI;
-
-    // 2. Select axis and filter details
-    let axis = 'y';
-    let filterCoordinate = 'y';
-    let filterValue = 0;
-
-    switch (base) {
-        case 'U':
-            axis = 'y';
-            filterCoordinate = 'y';
-            filterValue = 1;
-            break;
-        case 'D':
-            axis = 'y';
-            filterCoordinate = 'y';
-            filterValue = -1;
-            angle = -angle;
-            break;
-        case 'R':
-            axis = 'x';
-            filterCoordinate = 'x';
-            filterValue = 1;
-            break;
-        case 'L':
-            axis = 'x';
-            filterCoordinate = 'x';
-            filterValue = -1;
-            angle = -angle;
-            break;
-        case 'F':
-            axis = 'z';
-            filterCoordinate = 'z';
-            filterValue = 1;
-            break;
-        case 'B':
-            axis = 'z';
-            filterCoordinate = 'z';
-            filterValue = -1;
-            angle = -angle;
-            break;
-    }
-
-    // 3. Collect matching cubies
-    const sliceCubies = cubies.filter(cubie => {
-        const coordVal = Math.round(cubie.position[filterCoordinate]);
-        return coordVal === filterValue;
+    const positions = new Float32Array(cubies.length * 3);
+    const quaternions = new Float32Array(cubies.length * 4);
+    
+    cubies.forEach((cubie, idx) => {
+        positions[idx * 3] = cubie.position.x;
+        positions[idx * 3 + 1] = cubie.position.y;
+        positions[idx * 3 + 2] = cubie.position.z;
+        quaternions[idx * 4] = cubie.quaternion.x;
+        quaternions[idx * 4 + 1] = cubie.quaternion.y;
+        quaternions[idx * 4 + 2] = cubie.quaternion.z;
+        quaternions[idx * 4 + 3] = cubie.quaternion.w;
     });
 
-    // 4. Create pivot group
-    const pivot = new THREE.Group();
-    scene.add(pivot);
+    // Ask Rust for the mathematically perfect next state
+    const targetData = calculate_rotation_target(positions, quaternions, move);
 
-    sliceCubies.forEach(cubie => {
-        pivot.attach(cubie);
+    // Immediately snap meshes to target state
+    cubies.forEach((cubie, idx) => {
+        cubie.position.set(
+            targetData[idx * 7],
+            targetData[idx * 7 + 1],
+            targetData[idx * 7 + 2]
+        );
+        cubie.quaternion.set(
+            targetData[idx * 7 + 3],
+            targetData[idx * 7 + 4],
+            targetData[idx * 7 + 5],
+            targetData[idx * 7 + 6]
+        );
     });
-
-    // 5. Rotate pivot instantly
-    pivot.rotation[axis] = angle;
-
-    // 6. Snapping
-    pivot.updateMatrixWorld();
-    sliceCubies.forEach(cubie => {
-        scene.attach(cubie);
-        cubie.position.x = Math.round(cubie.position.x);
-        cubie.position.y = Math.round(cubie.position.y);
-        cubie.position.z = Math.round(cubie.position.z);
-
-        cubie.rotation.x = Math.round(cubie.rotation.x / (Math.PI / 2)) * (Math.PI / 2);
-        cubie.rotation.y = Math.round(cubie.rotation.y / (Math.PI / 2)) * (Math.PI / 2);
-        cubie.rotation.z = Math.round(cubie.rotation.z / (Math.PI / 2)) * (Math.PI / 2);
-    });
-
-    scene.remove(pivot);
 }
 

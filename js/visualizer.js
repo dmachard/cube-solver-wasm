@@ -1,5 +1,6 @@
 import { COLOR_HEX_MAP, state } from './constants.js';
 import { validateCube } from './editor.js';
+import { extract_state_from_3d } from '../pkg/cube_solver_wasm.js';
 
 // Internal Three.js Globals
 export let scene, camera, renderer, controls;
@@ -234,116 +235,42 @@ export function update3DCubeColors() {
 
 /**
  * Extract 2D state from the 3D cubies positions and material orientations
- * This makes the 3D scene the single source of truth, avoiding any mathematical drift.
+ * Passes Float32Arrays to Rust WASM for fast geometric dot products and index mappings.
  */
 export function getSolverStringFrom3D() {
-    const tempState = Array(54).fill('U');
+    const positions = new Float32Array(cubies.length * 3);
+    const quaternions = new Float32Array(cubies.length * 4);
+    let faceColors = "";
 
-    cubies.forEach(cubie => {
-        // Round coordinates to find its current world slot position
-        const x = Math.round(cubie.position.x);
-        const y = Math.round(cubie.position.y);
-        const z = Math.round(cubie.position.z);
+    cubies.forEach((cubie, idx) => {
+        // Collect Positions
+        positions[idx * 3] = cubie.position.x;
+        positions[idx * 3 + 1] = cubie.position.y;
+        positions[idx * 3 + 2] = cubie.position.z;
 
-        // Get the rotation matrix of the cubie
-        const matrix = new THREE.Matrix4();
-        matrix.makeRotationFromQuaternion(cubie.quaternion);
+        // Collect Quaternions
+        quaternions[idx * 4] = cubie.quaternion.x;
+        quaternions[idx * 4 + 1] = cubie.quaternion.y;
+        quaternions[idx * 4 + 2] = cubie.quaternion.z;
+        quaternions[idx * 4 + 3] = cubie.quaternion.w;
 
-        // Standard world normals for each face direction
-        const worldNormals = [
-            new THREE.Vector3(1, 0, 0),  // +x (Right)
-            new THREE.Vector3(-1, 0, 0), // -x (Left)
-            new THREE.Vector3(0, 1, 0),  // +y (Up)
-            new THREE.Vector3(0, -1, 0), // -y (Down)
-            new THREE.Vector3(0, 0, 1),  // +z (Front)
-            new THREE.Vector3(0, 0, -1)  // -z (Back)
-        ];
-
-        // Local normals of the box materials
-        const localNormals = [
-            new THREE.Vector3(1, 0, 0),
-            new THREE.Vector3(-1, 0, 0),
-            new THREE.Vector3(0, 1, 0),
-            new THREE.Vector3(0, -1, 0),
-            new THREE.Vector3(0, 0, 1),
-            new THREE.Vector3(0, 0, -1)
-        ];
-
-        // Loop over the 6 material faces
+        // Collect the facelet Kociemba characters in local space order
         for (let matIdx = 0; matIdx < 6; matIdx++) {
-            const worldNormal = localNormals[matIdx].clone().applyMatrix4(matrix);
+            const colorHex = '#' + cubie.material[matIdx].color.getHexString();
+            let colorChar = 'U';
 
-            // Find which world normal it aligns best with
-            let bestWorldDir = -1;
-            let maxDot = -1;
-            worldNormals.forEach((n, idx) => {
-                const dot = worldNormal.dot(n);
-                if (dot > maxDot) {
-                    maxDot = dot;
-                    bestWorldDir = idx;
-                }
-            });
-
-            // If the sticker points outwards in a world axis direction
-            if (maxDot > 0.8) {
-                // Determine the sticker's hex color
-                const colorHex = '#' + cubie.material[matIdx].color.getHexString();
-                let colorChar = 'U';
-
-                for (const [char, hex] of Object.entries(COLOR_HEX_MAP)) {
-                    if (hex.toLowerCase() === colorHex.toLowerCase()) {
-                        colorChar = char;
-                        break;
-                    }
-                }
-
-                // Map world coordinate slot + world pointing direction back to Kociemba index
-                // 1. Right Face (+X)
-                if (bestWorldDir === 0 && x === 1) {
-                    const faceletIndex = 9 + (2 - (y + 1)) * 3 + (2 - (z + 1));
-                    tempState[faceletIndex] = colorChar;
-                }
-                // 2. Left Face (-X)
-                else if (bestWorldDir === 1 && x === -1) {
-                    const faceletIndex = 36 + (2 - (y + 1)) * 3 + (z + 1);
-                    tempState[faceletIndex] = colorChar;
-                }
-                // 3. Up Face (+Y)
-                else if (bestWorldDir === 2 && y === 1) {
-                    const faceletIndex = 0 + (z + 1) * 3 + (x + 1);
-                    tempState[faceletIndex] = colorChar;
-                }
-                // 4. Down Face (-Y)
-                else if (bestWorldDir === 3 && y === -1) {
-                    const faceletIndex = 27 + (2 - (z + 1)) * 3 + (x + 1);
-                    tempState[faceletIndex] = colorChar;
-                }
-                // 5. Front Face (+Z)
-                else if (bestWorldDir === 4 && z === 1) {
-                    const faceletIndex = 18 + (2 - (y + 1)) * 3 + (x + 1);
-                    tempState[faceletIndex] = colorChar;
-                }
-                // 6. Back Face (-Z)
-                else if (bestWorldDir === 5 && z === -1) {
-                    const faceletIndex = 45 + (2 - (y + 1)) * 3 + (2 - (x + 1));
-                    tempState[faceletIndex] = colorChar;
+            for (const [char, hex] of Object.entries(COLOR_HEX_MAP)) {
+                if (hex.toLowerCase() === colorHex.toLowerCase()) {
+                    colorChar = char;
+                    break;
                 }
             }
+            faceColors += colorChar;
         }
     });
 
-    // Enforce locked centers to guarantee integrity
-    const FIXED_CENTERS = {
-        4: 'U',
-        13: 'R',
-        22: 'F',
-        31: 'D',
-        40: 'L',
-        49: 'B'
-    };
-    for (const [idx, char] of Object.entries(FIXED_CENTERS)) {
-        tempState[parseInt(idx)] = char;
-    }
-
-    state.cubeState = tempState;
+    // Delegate the heavy math and matrix extraction to the Rust WASM module!
+    const resultStr = extract_state_from_3d(positions, quaternions, faceColors);
+    
+    state.cubeState = resultStr.split('');
 }
