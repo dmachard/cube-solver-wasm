@@ -17,6 +17,7 @@ wasm-bindgen = "0.2"
 kewb = "0.4.3"
 # for random generation https://github.com/rust-random/getrandom
 getrandom = { version = "0.4", features = ["wasm_js"] }
+getrandom_v3 = { package = "getrandom", version = "0.3", features = ["wasm_js"] }
 js-sys = "0.3.98"
 
 [dev-dependencies]
